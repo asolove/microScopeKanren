@@ -19,11 +19,6 @@ union Cons {
 	}
 } deriving (Eq, Clone, Extractor)
 
-Cons.prototype.toString = function(){
-	var values = map(function(x){ return x; }, this);
-	return "(" + values.join(",") + ")";
-}
-
 union Substitutions {
 	Empty,
 	Substitution {
@@ -68,11 +63,9 @@ function walk {
 
 function equal(u, v) {
 	return function(st) {
-		var s = unify(u, v, st.s);
-		if(s) {
-			return Value(Success(s, st.c), Done)
-		} else {
-			return Done
+		return match unify(u, v, st.s) {
+			false => Done,
+			s => Value(Success(s, st.c), Done)
 		}
 	}
 }
@@ -137,6 +130,12 @@ function call_goal(g) {
 var emptyState = Success(Empty, 0);
 
 /* Convenience methods for inspecting the results */
+
+Cons.prototype.toString = function(){
+	var values = map(function(x){ return x; }, this);
+	return "(" + values.join(",") + ")";
+}
+
 function map {
 	(f, Nil) => [],
 	(f, Pair(a, d)) => [f(a)].concat(map(f, d))
@@ -152,6 +151,10 @@ function walkStar(v, s) {
 		Pair(a, d) => Pair(walkStar(a, s), walkStar(d, s)),
 		other => other
 	}
+}
+
+function run(n, goal) {
+	return map(reifyFirst, take(n, call_goal(call_fresh(goal))));
 }
 
 /* Let's try it out! */
@@ -178,26 +181,19 @@ function appendo(l, s, out) {
 }
 
 
-var forwards = map(reifyFirst, take(1, call_goal(call_fresh(function(res){
-	return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), res)
-}))));
+console.log("(appendo '(1 2) '(3) q): ",
+	run(1, function(q){
+		return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), q)
+	}).toString())
 
-console.log("(appendo '(1 2) '(3) q): " + forwards.toString());
+console.log("(appendo '(1 2) q '(1 2 3 4)): ",
+	run(1, function(q){
+		return appendo(Pair(1, Pair(2, Nil)), q, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))))
+	}).toString())
 
-
-
-var backwards = map(reifyFirst, take(1, call_goal(call_fresh(function(res){
-	return appendo(Pair(1, Pair(2, Nil)), res, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))))
-}))));
-
-console.log("(appendo '(1 2) q `(1 2 3 4)): " + backwards.toString());
-
-
-var options = map(reifyFirst, take(10, call_goal(call_fresh(function(res){
-	return call_fresh(function(other){
-		return appendo(res, other, Pair(1, Pair(2, Pair(3, Nil))));
-	})
-}))));
-
-console.log("(appendo q r '(1 2 3)): " + options.toString());
-
+console.log("(appendo q r '(1 2 3)) for q: ",
+	run(10, function(q){
+		return call_fresh(function(r){
+			return appendo(q, r, Pair(1, Pair(2, Pair(3, Nil))));
+		})
+	}).toString())

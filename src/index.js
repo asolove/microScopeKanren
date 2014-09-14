@@ -71,12 +71,6 @@ var Cons = function () {
     }();
 var Nil = Cons.Nil;
 var Pair = Cons.Pair;
-Cons.prototype.toString = function () {
-    var values = map(function (x) {
-            return x;
-        }, this);
-    return '(' + values.join(',') + ')';
-};
 var Substitutions = function () {
         function Substitutions$2() {
         }
@@ -293,12 +287,13 @@ function walk(a0, a1) {
 }
 function equal(u, v) {
     return function (st) {
-        var s = unify(u, v, st.s);
-        if (s) {
+        return function (a0) {
+            if (a0 === false) {
+                return Done;
+            }
+            var s = a0;
             return Value(Success(s, st.c), Done);
-        } else {
-            return Done;
-        }
+        }.call(this, unify(u, v, st.s));
     };
 }
 function unify(a0, a1, a2) {
@@ -446,40 +441,14 @@ var emptyState = Success(Empty, 0);
 function call_goal(g) {
     return g(emptyState);
 }
-/*
-	Test programs
-
-(define appendo
-  (lambda (l s out)
-    (disj
-     (conj (== '() l) (== s out))
-     (call/fresh
-      (lambda (a)
-        (call/fresh
-         (lambda (d)
-           (conj
-            (== `(,a . ,d) l)
-            (call/fresh
-             (lambda (res)
-               (conj
-                (== `(,a . ,res) out)
-                (lambda (s/c)
-                  (lambda ()
-                    ((appendo d s res) s/c))))))))))))))
-
-*/
 var emptyState = Success(Empty, 0);
-function appendo(l, s, out) {
-    return disj(conj(equal(Nil, l), equal(s, out)), call_fresh(function (a) {
-        return call_fresh(function (d) {
-            return conj(equal(Pair(a, d), l), call_fresh(function (res) {
-                return conj(equal(Pair(a, res), out), function (st) {
-                    return appendo(d, s, res)(st);
-                });
-            }));
-        });
-    }));
-}
+/* Convenience methods for inspecting the results */
+Cons.prototype.toString = function () {
+    var values = map(function (x) {
+            return x;
+        }, this);
+    return '(' + values.join(',') + ')';
+};
 function map(a0, a1) {
     if (Nil.hasInstance ? Nil.hasInstance(a1) : a1 instanceof Nil) {
         var f = a0;
@@ -513,17 +482,29 @@ function walkStar(v, s) {
         return other;
     }.call(this, walk(v, s));
 }
-var forwards = map(reifyFirst, take(1, call_goal(call_fresh(function (res) {
-        return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), res);
-    }))));
-console.log('(appendo \'(1 2) \'(3) q): ' + forwards.toString());
-var backwards = map(reifyFirst, take(1, call_goal(call_fresh(function (res) {
-        return appendo(Pair(1, Pair(2, Nil)), res, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))));
-    }))));
-console.log('(appendo \'(1 2) q `(1 2 3 4)): ' + backwards.toString());
-var options = map(reifyFirst, take(10, call_goal(call_fresh(function (res) {
-        return call_fresh(function (other) {
-            return appendo(res, other, Pair(1, Pair(2, Pair(3, Nil))));
+function run(n, goal) {
+    return map(reifyFirst, take(n, call_goal(call_fresh(goal))));
+}
+/* Let's try it out! */
+function appendo(l, s, out) {
+    return disj(conj(equal(Nil, l), equal(s, out)), call_fresh(function (a) {
+        return call_fresh(function (d) {
+            return conj(equal(Pair(a, d), l), call_fresh(function (res) {
+                return conj(equal(Pair(a, res), out), function (st) {
+                    return appendo(d, s, res)(st);
+                });
+            }));
         });
-    }))));
-console.log('(appendo q r \'(1 2 3)): ' + options.toString());
+    }));
+}
+console.log('(appendo \'(1 2) \'(3) q): ', run(1, function (q) {
+    return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), q);
+}).toString());
+console.log('(appendo \'(1 2) q \'(1 2 3 4)): ', run(1, function (q) {
+    return appendo(Pair(1, Pair(2, Nil)), q, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))));
+}).toString());
+console.log('(appendo q r \'(1 2 3)) for q: ', run(10, function (q) {
+    return call_fresh(function (r) {
+        return appendo(q, r, Pair(1, Pair(2, Pair(3, Nil))));
+    });
+}).toString());
