@@ -1,9 +1,10 @@
 // microKanren, (c) Jason Hemann and Dan Friedman
 // JS implementation and tracing support by Adam Solove
-var Eq = require('adt-simple').Eq;
 var Clone = require('adt-simple').Clone;
-var ToString = require('adt-simple').ToString;
+var Eq = require('adt-simple').Eq;
 var Extractor = require('adt-simple').Extractor;
+var Setter = require('adt-simple').Setter;
+var ToString = require('adt-simple').ToString;
 var Variable = function () {
         function Variable$2(i) {
             if (!(this instanceof Variable$2)) {
@@ -78,16 +79,16 @@ var Substitutions = function () {
         }
         Empty$2.prototype = new Substitutions$2();
         Empty$2.prototype.constructor = Empty$2;
-        function Substitution$2(v, val, r) {
+        function Substitution$2(u, v, r) {
             if (!(this instanceof Substitution$2)) {
-                return new Substitution$2(v, val, r);
+                return new Substitution$2(u, v, r);
             }
-            if (v instanceof Variable) {
-                this.v = v;
+            if (u instanceof Variable) {
+                this.u = u;
             } else {
-                throw new TypeError('Unexpected type for field Substitutions.Substitution.v: ' + v.toString());
+                throw new TypeError('Unexpected type for field Substitutions.Substitution.u: ' + u.toString());
             }
-            this.val = val;
+            this.v = v;
             if (r instanceof Substitutions) {
                 this.r = r;
             } else {
@@ -111,8 +112,8 @@ var Substitutions = function () {
                         constructor: Substitution$2,
                         prototype: Substitution$2.prototype,
                         fields: [
+                            'u',
                             'v',
-                            'val',
                             'r'
                         ]
                     }
@@ -127,9 +128,9 @@ var Substitution = Substitutions.Substitution;
 var State = function () {
         function State$2() {
         }
-        function Success$2(s, c) {
+        function Success$2(s, c, t) {
             if (!(this instanceof Success$2)) {
-                return new Success$2(s, c);
+                return new Success$2(s, c, t);
             }
             if (s instanceof Substitutions) {
                 this.s = s;
@@ -141,10 +142,15 @@ var State = function () {
             } else {
                 throw new TypeError('Unexpected type for field State.Success.c: ' + c.toString());
             }
+            if (Array.isArray ? Array.isArray(t) : Object.prototype.toString.call(t) === '[object Array]') {
+                this.t = t;
+            } else {
+                throw new TypeError('Unexpected type for field State.Success.t: ' + t.toString());
+            }
         }
         Success$2.prototype = new State$2();
         Success$2.prototype.constructor = Success$2;
-        var derived = Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
+        var derived = Setter.derive(Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
                 name: 'State',
                 constructor: State$2,
                 prototype: State$2.prototype,
@@ -154,14 +160,54 @@ var State = function () {
                         prototype: Success$2.prototype,
                         fields: [
                             's',
-                            'c'
+                            'c',
+                            't'
                         ]
                     }]
-            }))));
+            })))));
         State$2.Success = derived.variants[0].constructor;
         return State$2;
     }();
 var Success = State.Success;
+State.prototype.addTrace = function (a0) {
+    if (TraceFrame.hasInstance ? TraceFrame.hasInstance(a0) : a0 instanceof TraceFrame) {
+        var t = a0;
+        return this.set({ t: this.t.concat([t]) });
+    }
+    throw new TypeError('No match');
+};
+var TraceFrame = function () {
+        function TraceFrame$2(n, s) {
+            if (!(this instanceof TraceFrame$2)) {
+                return new TraceFrame$2(n, s);
+            }
+            if (typeof n === 'string' || Object.prototype.toString.call(n) === '[object String]') {
+                this.n = n;
+            } else {
+                throw new TypeError('Unexpected type for field TraceFrame.n: ' + n.toString());
+            }
+            if (s instanceof Substitutions) {
+                this.s = s;
+            } else {
+                throw new TypeError('Unexpected type for field TraceFrame.s: ' + s.toString());
+            }
+        }
+        var derived = Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
+                name: 'TraceFrame',
+                constructor: TraceFrame$2,
+                prototype: TraceFrame$2.prototype,
+                variants: [{
+                        name: 'TraceFrame',
+                        constructor: TraceFrame$2,
+                        prototype: TraceFrame$2.prototype,
+                        fields: [
+                            'n',
+                            's'
+                        ]
+                    }]
+            }))));
+        return derived.constructor;
+    }();
 var Stream = function () {
         function Stream$2() {
         }
@@ -181,19 +227,19 @@ var Stream = function () {
         }
         Thunk$2.prototype = new Stream$2();
         Thunk$2.prototype.constructor = Thunk$2;
-        function Value$2(head, tail) {
+        function Value$2(v, r) {
             if (!(this instanceof Value$2)) {
-                return new Value$2(head, tail);
+                return new Value$2(v, r);
             }
-            if (head instanceof State) {
-                this.head = head;
+            if (v instanceof State) {
+                this.v = v;
             } else {
-                throw new TypeError('Unexpected type for field Stream.Value.head: ' + head.toString());
+                throw new TypeError('Unexpected type for field Stream.Value.v: ' + v.toString());
             }
-            if (tail instanceof Stream) {
-                this.tail = tail;
+            if (r instanceof Stream) {
+                this.r = r;
             } else {
-                throw new TypeError('Unexpected type for field Stream.Value.tail: ' + tail.toString());
+                throw new TypeError('Unexpected type for field Stream.Value.r: ' + r.toString());
             }
         }
         Value$2.prototype = new Stream$2();
@@ -219,8 +265,8 @@ var Stream = function () {
                         constructor: Value$2,
                         prototype: Value$2.prototype,
                         fields: [
-                            'head',
-                            'tail'
+                            'v',
+                            'r'
                         ]
                     }
                 ]
@@ -292,7 +338,7 @@ function equal(u, v) {
                 return Done;
             }
             var s = a0;
-            return Value(Success(s, st.c), Done);
+            return Value(Success(s, st.c, st.t), Done);
         }.call(this, unify(u, v, st.s));
     };
 }
@@ -345,10 +391,11 @@ function unify(a0, a1, a2) {
 function call_fresh(f) {
     return function (a0) {
         var r0 = Success.unapply(a0);
-        if (r0 != null && r0.length === 2) {
+        if (r0 != null && r0.length === 3) {
             var s = r0[0];
             var c = r0[1];
-            return f(Variable(c))(Success(s, c + 1));
+            var t = r0[2];
+            return f(Variable(c))(Success(s, c + 1, t));
         }
         throw new TypeError('No match');
     };
@@ -411,11 +458,11 @@ function bind(a0, a1) {
 function take(a0, a1) {
     if (a0 === 0) {
         var _ = a1;
-        return Nil;
+        return [];
     }
     if (Done.hasInstance ? Done.hasInstance(a1) : a1 instanceof Done) {
         var n = a0;
-        return Nil;
+        return [];
     }
     var r0 = Thunk.unapply(a1);
     if (r0 != null && r0.length === 1) {
@@ -426,42 +473,72 @@ function take(a0, a1) {
     var r1 = Value.unapply(a1);
     if (r1 != null && r1.length === 2) {
         var r2 = r1[0];
-        var r3 = Success.unapply(r2);
-        if (r3 != null && r3.length === 2) {
+        if (Success.hasInstance ? Success.hasInstance(r2) : r2 instanceof Success) {
             var n = a0;
-            var s = r3[0];
-            var c = r3[1];
+            var s = r2;
             var rest = r1[1];
-            return Pair(s, take(n - 1, rest));
+            return [s].concat(take(n - 1, rest));
         }
     }
     throw new TypeError('No match');
 }
-var emptyState = Success(Empty, 0);
+var emptyState = Success(Empty, 0, []);
 function call_goal(g) {
     return g(emptyState);
 }
-var emptyState = Success(Empty, 0);
 /* Convenience methods for inspecting the results */
 Cons.prototype.toString = function () {
-    var values = map(function (x) {
-            return x;
-        }, this);
-    return '(' + values.join(',') + ')';
+    return '(' + this.toArray().join(',') + ')';
 };
-function map(a0, a1) {
-    if (Nil.hasInstance ? Nil.hasInstance(a1) : a1 instanceof Nil) {
-        var f = a0;
-        return [];
+Cons.prototype.toArray = function () {
+    return function (a0) {
+        if (Nil.hasInstance ? Nil.hasInstance(a0) : a0 instanceof Nil) {
+            return [];
+        }
+        var r0 = Pair.unapply(a0);
+        if (r0 != null && r0.length === 2) {
+            var r1 = r0[1];
+            if (Pair.hasInstance ? Pair.hasInstance(r1) : r1 instanceof Pair) {
+                var a = r0[0];
+                var d = r1;
+                return [a].concat(d.toArray());
+            }
+            var a = r0[0];
+            var d = r1;
+            return [a].concat([d]);
+        }
+        throw new TypeError('No match');
+    }.call(this, this);
+};
+Substitutions.prototype.toObject = function () {
+    var r = {};
+    var s = this;
+    while (s != Empty) {
+        r[s.u.i] = walkStar(s.u, this);
+        s = s.r;
     }
-    var r0 = Pair.unapply(a1);
+    return r;
+};
+function inspectTraceFrame(a0) {
+    var r0 = TraceFrame.unapply(a0);
     if (r0 != null && r0.length === 2) {
-        var f = a0;
-        var a = r0[0];
-        var d = r0[1];
-        return [f(a)].concat(map(f, d));
+        var name = r0[0];
+        var ss = r0[1];
+        return name + ': ' + require('util').inspect(ss.toObject());
     }
     throw new TypeError('No match');
+}
+function inspectTrace(states) {
+    return states.map(function (a0) {
+        var r0 = Success.unapply(a0);
+        if (r0 != null && r0.length === 3) {
+            var s = r0[0];
+            var c = r0[1];
+            var t = r0[2];
+            return 'Found: ' + reifyFirst(s) + ' via \n' + t.map(inspectTraceFrame).join('\n');
+        }
+        throw new TypeError('No match');
+    }).join('\n\n');
 }
 function reifyFirst(state) {
     return walkStar(Variable(0), state);
@@ -483,15 +560,51 @@ function walkStar(v, s) {
     }.call(this, walk(v, s));
 }
 function run(n, goal) {
-    return map(reifyFirst, take(n, call_goal(call_fresh(goal))));
+    return take(n, call_goal(call_fresh(goal))).map(function (state) {
+        return reifyFirst(state.s);
+    });
+}
+function runTrace(n, goal) {
+    return take(n, call_goal(call_fresh(goal)));
+}
+/* Tracing goals */
+function trace(name, goal) {
+    return function (st) {
+        return traceStream(goal(st), name, st);
+    };
+}
+function traceStream(a0, a1, a2) {
+    if (Done.hasInstance ? Done.hasInstance(a0) : a0 instanceof Done) {
+        var _ = a2;
+        var _ = a2;
+        return Done;
+    }
+    var r0 = Thunk.unapply(a0);
+    if (r0 != null && (r0.length === 1 && (State.hasInstance ? State.hasInstance(a2) : a2 instanceof State))) {
+        var t = r0[0];
+        var n = a1;
+        var s = a2;
+        return Thunk(function () {
+            return traceStream(t(), n, s);
+        });
+    }
+    var r1 = Value.unapply(a0);
+    if (r1 != null && (r1.length === 2 && (State.hasInstance ? State.hasInstance(a2) : a2 instanceof State))) {
+        var s = r1[0];
+        var rest = r1[1];
+        var n = a1;
+        var st = a2;
+        return Value(s.addTrace(TraceFrame(n, s.s)), traceStream(rest, n, st));
+    }
+    throw new TypeError('No match');
 }
 /* Let's try it out! */
 function appendo(l, s, out) {
     return disj(conj(equal(Nil, l), equal(s, out)), call_fresh(function (a) {
         return call_fresh(function (d) {
-            return conj(equal(Pair(a, d), l), call_fresh(function (res) {
-                return conj(equal(Pair(a, res), out), function (st) {
-                    return appendo(d, s, res)(st);
+            return conj(trace('equal(Pair(a, d), l)', equal(Pair(a, d), l)), call_fresh(function (res) {
+                return conj(trace('equal(Pair(a, res), out)', equal(Pair(a, res), out)), function (st) {
+                    return trace('appendo(d, s, res)', appendo(d, s, res))(st);
                 });
             }));
         });
@@ -508,3 +621,6 @@ console.log('(appendo q r \'(1 2 3)) for q: ', run(10, function (q) {
         return appendo(q, r, Pair(1, Pair(2, Pair(3, Nil))));
     });
 }).toString());
+console.log('How did we find answer to (appendo \'(1 2) \'(3) q): ', inspectTrace(runTrace(1, function (q) {
+    return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), q);
+})));

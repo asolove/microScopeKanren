@@ -1,10 +1,11 @@
 // microKanren, (c) Jason Hemann and Dan Friedman
 // JS implementation and tracing support by Adam Solove
 
-var Eq = require('adt-simple').Eq;
 var Clone = require('adt-simple').Clone;
-var ToString = require('adt-simple').ToString;
+var Eq = require('adt-simple').Eq;
 var Extractor = require('adt-simple').Extractor;
+var Setter = require('adt-simple').Setter;
+var ToString = require('adt-simple').ToString;
 
 
 data Variable {
@@ -22,8 +23,8 @@ union Cons {
 union Substitutions {
 	Empty,
 	Substitution {
-		v: Variable,
-		val: *,
+		u: Variable,
+		v: *,
 		r: Substitutions
 	}
 } deriving (Eq, Clone, ToString, Extractor)
@@ -31,8 +32,18 @@ union Substitutions {
 union State {
 	Success {
 		s: Substitutions,
-		c: Number
+		c: Number,
+		t: Array // of TraceTrames
 	}
+} deriving (Eq, Clone, ToString, Extractor, Setter)
+
+State.prototype.addTrace = function {
+	t@TraceFrame => this.set({t: this.t.concat([t])})
+}
+
+data TraceFrame {
+	n: String,
+	s: Substitutions
 } deriving (Eq, Clone, ToString, Extractor)
 
 union Stream {
@@ -41,8 +52,8 @@ union Stream {
 		fn: Function
 	},
 	Value {
-		head: State,
-		tail: Stream
+		v: State,
+		r: Stream
 	}
 } deriving (Eq, Clone, ToString, Extractor)
 
@@ -65,7 +76,7 @@ function equal(u, v) {
 	return function(st) {
 		return match unify(u, v, st.s) {
 			false => Done,
-			s => Value(Success(s, st.c), Done)
+			s => Value(Success(s, st.c, st.t), Done)
 		}
 	}
 }
@@ -84,7 +95,7 @@ function unify {
 
 function call_fresh (f) {
 	return function {
-		(Success(s, c)) => f(Variable(c))(Success(s, c+1))
+		(Success(s, c, t)) => f(Variable(c))(Success(s, c+1, t))
 	}
 }
 
@@ -115,30 +126,51 @@ function bind {
 
 /* Runner */
 function take {
-	(0, _) => Nil,
-	(n, Done) => Nil,
+	(0, _) => [],
+	(n, Done) => [],
 	(n, Thunk(fn)) => take(n, fn()),
-	(n, Value(Success(s, c), rest)) => Pair(s, take(n-1, rest))
+	(n, Value(s@Success, rest)) => [s].concat(take(n-1, rest))
 }
 
-var emptyState = Success(Empty, 0)
+var emptyState = Success(Empty, 0, [])
 
 function call_goal(g) {
 	return g(emptyState)
 }
 
-var emptyState = Success(Empty, 0);
-
 /* Convenience methods for inspecting the results */
 
 Cons.prototype.toString = function(){
-	var values = map(function(x){ return x; }, this);
-	return "(" + values.join(",") + ")";
+	return "(" + this.toArray().join(",") + ")";
 }
 
-function map {
-	(f, Nil) => [],
-	(f, Pair(a, d)) => [f(a)].concat(map(f, d))
+Cons.prototype.toArray = function() {
+	return match this {
+		Nil => [],
+		Pair(a, d@Pair) => [a].concat(d.toArray()),
+		Pair(a, d) => [a].concat([d])
+	}
+}
+
+Substitutions.prototype.toObject = function() {
+	var r = {};
+	var s = this;
+	while(s != Empty) {
+		r[s.u.i] = walkStar(s.u, this);
+		s = s.r;
+	}
+	return r;
+}
+
+function inspectTraceFrame {
+	TraceFrame(name, ss) => name + ": " + require("util").inspect(ss.toObject());
+}
+
+function inspectTrace(states) {
+	return states.map(function {
+		Success(s, c, t) => 
+			"Found: " + reifyFirst(s) + " via \n" + t.map(inspectTraceFrame).join("\n");
+	}).join("\n\n");
 }
 
 function reifyFirst(state){
@@ -154,8 +186,29 @@ function walkStar(v, s) {
 }
 
 function run(n, goal) {
-	return map(reifyFirst, take(n, call_goal(call_fresh(goal))));
+	return take(n, call_goal(call_fresh(goal))).map(
+			function(state){ return reifyFirst(state.s); });
 }
+
+function runTrace(n, goal) {
+	return take(n, call_goal(call_fresh(goal)));
+}
+
+/* Tracing goals */
+function trace(name, goal) {
+	return function(st) {
+		return traceStream(goal(st), name, st);
+	}
+}
+
+function traceStream {
+	(Done, _, _) => Done,
+	(Thunk(t), n, s@State) => Thunk(function(){ return traceStream(t(), n, s) }),
+	(Value(s, rest), n, st@State) => 
+		Value(s.addTrace(TraceFrame(n, s.s)),
+			traceStream(rest, n, st))
+}
+
 
 /* Let's try it out! */
 
@@ -165,12 +218,12 @@ function appendo(l, s, out) {
 		call_fresh(function (a){
 			return call_fresh(function(d){
 				return conj(
-					equal(Pair(a, d), l),
+					trace("equal(Pair(a, d), l)", equal(Pair(a, d), l)),
 					call_fresh(function(res){
 						return conj(
-							equal(Pair(a, res), out),
+							trace("equal(Pair(a, res), out)", equal(Pair(a, res), out)),
 							function(st) {
-								return appendo(d, s, res)(st)
+								return trace("appendo(d, s, res)", appendo(d, s, res))(st);
 							}
 						)
 					})
@@ -197,3 +250,8 @@ console.log("(appendo q r '(1 2 3)) for q: ",
 			return appendo(q, r, Pair(1, Pair(2, Pair(3, Nil))));
 		})
 	}).toString())
+
+console.log("How did we find answer to (appendo '(1 2) '(3) q): ",
+	inspectTrace(runTrace(1, function(q){
+		return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), q)
+	})));
