@@ -150,11 +150,24 @@ var State = function () {
         }
         Success$2.prototype = new State$2();
         Success$2.prototype.constructor = Success$2;
+        function Failure$2(t) {
+            if (!(this instanceof Failure$2)) {
+                return new Failure$2(t);
+            }
+            if (Array.isArray ? Array.isArray(t) : Object.prototype.toString.call(t) === '[object Array]') {
+                this.t = t;
+            } else {
+                throw new TypeError('Unexpected type for field State.Failure.t: ' + t.toString());
+            }
+        }
+        Failure$2.prototype = new State$2();
+        Failure$2.prototype.constructor = Failure$2;
         var derived = Setter.derive(Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
                 name: 'State',
                 constructor: State$2,
                 prototype: State$2.prototype,
-                variants: [{
+                variants: [
+                    {
                         name: 'Success',
                         constructor: Success$2,
                         prototype: Success$2.prototype,
@@ -163,12 +176,21 @@ var State = function () {
                             'c',
                             't'
                         ]
-                    }]
+                    },
+                    {
+                        name: 'Failure',
+                        constructor: Failure$2,
+                        prototype: Failure$2.prototype,
+                        fields: ['t']
+                    }
+                ]
             })))));
         State$2.Success = derived.variants[0].constructor;
+        State$2.Failure = derived.variants[1].constructor;
         return State$2;
     }();
 var Success = State.Success;
+var Failure = State.Failure;
 State.prototype.addTrace = function (a0) {
     if (TraceFrame.hasInstance ? TraceFrame.hasInstance(a0) : a0 instanceof TraceFrame) {
         var t = a0;
@@ -335,7 +357,7 @@ function equal(u, v) {
     return function (st) {
         return function (a0) {
             if (a0 === false) {
-                return Done;
+                return Value(Failure(st.t), Done);
             }
             var s = a0;
             return Value(Success(s, st.c, st.t), Done);
@@ -388,14 +410,18 @@ function unify(a0, a1, a2) {
     }
     return false;
 }
-function call_fresh(f) {
+function call_fresh(fn) {
     return function (a0) {
+        if (Failure.hasInstance ? Failure.hasInstance(a0) : a0 instanceof Failure) {
+            var f = a0;
+            return Value(f, Done);
+        }
         var r0 = Success.unapply(a0);
         if (r0 != null && r0.length === 3) {
             var s = r0[0];
             var c = r0[1];
             var t = r0[2];
-            return f(Variable(c))(Success(s, c + 1, t));
+            return fn(Variable(c))(Success(s, c + 1, t));
         }
         throw new TypeError('No match');
     };
@@ -478,6 +504,12 @@ function take(a0, a1) {
             var s = r2;
             var rest = r1[1];
             return [s].concat(take(n - 1, rest));
+        }
+        if (Failure.hasInstance ? Failure.hasInstance(r2) : r2 instanceof Failure) {
+            var n = a0;
+            var f = r2;
+            var rest = r1[1];
+            return take(n, rest);
         }
     }
     throw new TypeError('No match');
@@ -589,12 +621,22 @@ function traceStream(a0, a1, a2) {
         });
     }
     var r1 = Value.unapply(a0);
-    if (r1 != null && (r1.length === 2 && (State.hasInstance ? State.hasInstance(a2) : a2 instanceof State))) {
-        var s = r1[0];
-        var rest = r1[1];
-        var n = a1;
-        var st = a2;
-        return Value(s.addTrace(TraceFrame(n, s.s)), traceStream(rest, n, st));
+    if (r1 != null && r1.length === 2) {
+        var r2 = r1[0];
+        if ((Failure.hasInstance ? Failure.hasInstance(r2) : r2 instanceof Failure) && (State.hasInstance ? State.hasInstance(a2) : a2 instanceof State)) {
+            var f = r2;
+            var rest = r1[1];
+            var n = a1;
+            var st = a2;
+            return Value(f, rest);
+        }
+        if ((Success.hasInstance ? Success.hasInstance(r2) : r2 instanceof Success) && (State.hasInstance ? State.hasInstance(a2) : a2 instanceof State)) {
+            var s = r2;
+            var rest = r1[1];
+            var n = a1;
+            var st = a2;
+            return Value(s.addTrace(TraceFrame(n, s.s)), traceStream(rest, n, st));
+        }
     }
     throw new TypeError('No match');
 }
@@ -621,6 +663,8 @@ console.log('(appendo q r \'(1 2 3)) for q: ', run(10, function (q) {
         return appendo(q, r, Pair(1, Pair(2, Pair(3, Nil))));
     });
 }).toString());
-console.log('How did we find answer to (appendo \'(1 2) \'(3) q): ', inspectTrace(runTrace(1, function (q) {
-    return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), q);
+console.log('How did we find answer to (appendo q r \'(1 2 3 4)): ', inspectTrace(runTrace(5, function (q) {
+    return call_fresh(function (r) {
+        return appendo(q, r, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))));
+    });
 })));

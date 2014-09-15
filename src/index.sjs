@@ -33,7 +33,10 @@ union State {
 	Success {
 		s: Substitutions,
 		c: Number,
-		t: Array // of TraceTrames
+		t: Array // of TraceFrames
+	},
+	Failure {
+		t: Array // of TraceFrames
 	}
 } deriving (Eq, Clone, ToString, Extractor, Setter)
 
@@ -75,7 +78,7 @@ function walk {
 function equal(u, v) {
 	return function(st) {
 		return match unify(u, v, st.s) {
-			false => Done,
+			false => Value(Failure(st.t), Done),
 			s => Value(Success(s, st.c, st.t), Done)
 		}
 	}
@@ -93,9 +96,10 @@ function unify {
 	default => false
 }
 
-function call_fresh (f) {
+function call_fresh (fn) {
 	return function {
-		(Success(s, c, t)) => f(Variable(c))(Success(s, c+1, t))
+		f@Failure => Value(f, Done),
+		Success(s, c, t) => fn(Variable(c))(Success(s, c+1, t))
 	}
 }
 
@@ -129,7 +133,8 @@ function take {
 	(0, _) => [],
 	(n, Done) => [],
 	(n, Thunk(fn)) => take(n, fn()),
-	(n, Value(s@Success, rest)) => [s].concat(take(n-1, rest))
+	(n, Value(s@Success, rest)) => [s].concat(take(n-1, rest)),
+	(n, Value(f@Failure, rest)) => take(n, rest)
 }
 
 var emptyState = Success(Empty, 0, [])
@@ -204,7 +209,8 @@ function trace(name, goal) {
 function traceStream {
 	(Done, _, _) => Done,
 	(Thunk(t), n, s@State) => Thunk(function(){ return traceStream(t(), n, s) }),
-	(Value(s, rest), n, st@State) => 
+	(Value(f@Failure, rest), n, st@State) => Value(f, rest),
+	(Value(s@Success, rest), n, st@State) => 
 		Value(s.addTrace(TraceFrame(n, s.s)),
 			traceStream(rest, n, st))
 }
@@ -233,7 +239,6 @@ function appendo(l, s, out) {
 	)
 }
 
-
 console.log("(appendo '(1 2) '(3) q): ",
 	run(1, function(q){
 		return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), q)
@@ -251,7 +256,9 @@ console.log("(appendo q r '(1 2 3)) for q: ",
 		})
 	}).toString())
 
-console.log("How did we find answer to (appendo '(1 2) '(3) q): ",
-	inspectTrace(runTrace(1, function(q){
-		return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), q)
+console.log("How did we find answer to (appendo q r '(1 2 3 4)): ",
+	inspectTrace(runTrace(5, function(q){
+		return call_fresh(function(r){
+			return appendo(q, r, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))));
+		})
 	})));
