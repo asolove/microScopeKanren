@@ -52,7 +52,8 @@ State.prototype.addTrace = function {
 
 data TraceFrame {
 	n: String,
-	s: Substitutions
+	before: Substitutions,
+	after: Substitutions
 } deriving (Eq, Clone, ToString, Extractor)
 
 union Stream {
@@ -168,7 +169,9 @@ Substitutions.prototype.toObject = function() {
 }
 
 function inspectTraceFrame {
-	TraceFrame(name, ss) => name + ": " + require("util").inspect(ss.toObject());
+	TraceFrame(name, before, after) => 
+		name + ": " + require("util").inspect(before.toObject()) + 
+		" => " + require("util").inspect(after.toObject());
 }
 
 function inspectTrace(states) {
@@ -211,7 +214,7 @@ function traceStream {
 	(Thunk(t), n, s@State) => Thunk(function(){ return traceStream(t(), n, s) }),
 	(Value(f@Failure, rest), n, st@State) => Value(f, rest),
 	(Value(s@Success, rest), n, st@State) => 
-		Value(s.addTrace(TraceFrame(n, s.s)),
+		Value(s.addTrace(TraceFrame(n, st.s, s.s)),
 			traceStream(rest, n, st))
 }
 

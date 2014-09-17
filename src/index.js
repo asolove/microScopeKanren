@@ -180,19 +180,24 @@ State.prototype.addTrace = function (a0) {
     throw new TypeError('No match');
 };
 var TraceFrame = function () {
-        function TraceFrame$2(n, s) {
+        function TraceFrame$2(n, before, after) {
             if (!(this instanceof TraceFrame$2)) {
-                return new TraceFrame$2(n, s);
+                return new TraceFrame$2(n, before, after);
             }
             if (typeof n === 'string' || Object.prototype.toString.call(n) === '[object String]') {
                 this.n = n;
             } else {
                 throw new TypeError('Unexpected type for field: TraceFrame.n');
             }
-            if (s instanceof Substitutions) {
-                this.s = s;
+            if (before instanceof Substitutions) {
+                this.before = before;
             } else {
-                throw new TypeError('Unexpected type for field: TraceFrame.s');
+                throw new TypeError('Unexpected type for field: TraceFrame.before');
+            }
+            if (after instanceof Substitutions) {
+                this.after = after;
+            } else {
+                throw new TypeError('Unexpected type for field: TraceFrame.after');
             }
         }
         var derived = Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
@@ -205,7 +210,8 @@ var TraceFrame = function () {
                         prototype: TraceFrame$2.prototype,
                         fields: [
                             'n',
-                            's'
+                            'before',
+                            'after'
                         ]
                     }]
             }))));
@@ -510,10 +516,11 @@ Substitutions.prototype.toObject = function () {
 };
 function inspectTraceFrame(a0) {
     var r0 = TraceFrame.unapply(a0);
-    if (r0 != null && r0.length === 2) {
+    if (r0 != null && r0.length === 3) {
         var name = r0[0];
-        var ss = r0[1];
-        return name + ': ' + require('util').inspect(ss.toObject());
+        var before = r0[1];
+        var after = r0[2];
+        return name + ': ' + require('util').inspect(before.toObject()) + ' => ' + require('util').inspect(after.toObject());
     }
     throw new TypeError('No match');
 }
@@ -592,7 +599,7 @@ function traceStream(a0, a1, a2) {
             var rest = r1[1];
             var n = a1;
             var st = a2;
-            return Value(s.addTrace(TraceFrame(n, s.s)), traceStream(rest, n, st));
+            return Value(s.addTrace(TraceFrame(n, st.s, s.s)), traceStream(rest, n, st));
         }
     }
     throw new TypeError('No match');
