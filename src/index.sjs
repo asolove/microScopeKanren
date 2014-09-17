@@ -12,6 +12,10 @@ data Variable {
 	i: Number
 } deriving (Eq, Clone, ToString, Extractor)
 
+Variable.prototype.toString = function(){
+	return "_." + this.i;
+}
+
 union Cons {
 	Nil,
 	Pair {
@@ -20,14 +24,16 @@ union Cons {
 	}
 } deriving (Eq, Clone, Extractor)
 
-union Substitutions {
-	Empty,
-	Substitution {
-		u: Variable,
-		v: *,
-		r: Substitutions
-	}
+
+data Substitutions {
+	variables: Array // variable index => value
 } deriving (Eq, Clone, ToString, Extractor)
+
+Substitutions.prototype.extend = function(v, value) {
+	var variables = this.variables.map(function(x){ return x; });
+	variables[v.i] = value;
+	return Substitutions(variables);
+}
 
 union State {
 	Success {
@@ -61,9 +67,7 @@ union Stream {
 } deriving (Eq, Clone, ToString, Extractor)
 
 function step {
-	(Variable(v), Empty) => false,
-	(Variable(v), Substitution(Variable(v2), val, _)) if v == v2 => val,
-	(v@Variable, Substitution(_, _, ss)) => step(v, ss)
+	(Variable(v), Substitutions(s)) => s[v] || false
 }
 
 function walk {
@@ -87,8 +91,8 @@ function equal(u, v) {
 function unify {
 	(u, v, s@Substitutions) => match (walk(u, s), walk(v, s)) {
 		(Variable(v), Variable(u)) if v == u => s,
-		(u@Variable, v) => Substitution(u, v, s),
-		(u, v@Variable) => Substitution(v, u, s),
+		(u@Variable, v) => s.extend(u, v),
+		(u, v@Variable) => s.extend(v, u),
 		(Pair(a1, d1), Pair(a2, d2)) => unify(d1, d2, unify(a1, a2, s)),
 		(u, v) if u == v => s,
 		default => false
@@ -137,7 +141,7 @@ function take {
 	(n, Value(f@Failure, rest)) => take(n, rest)
 }
 
-var emptyState = Success(Empty, 0, [])
+var emptyState = Success(Substitutions([]), 0, [])
 
 function call_goal(g) {
 	return g(emptyState)
@@ -152,19 +156,15 @@ Cons.prototype.toString = function(){
 Cons.prototype.toArray = function() {
 	return match this {
 		Nil => [],
-		Pair(a, d@Pair) => [a].concat(d.toArray()),
+		Pair(a, d@Cons) => [a].concat(d.toArray()),
 		Pair(a, d) => [a].concat([d])
 	}
 }
 
 Substitutions.prototype.toObject = function() {
-	var r = {};
-	var s = this;
-	while(s != Empty) {
-		r[s.u.i] = walkStar(s.u, this);
-		s = s.r;
-	}
-	return r;
+	return this.variables.map(function(i){
+		return walkStar(i, this).toString();
+	}.bind(this));
 }
 
 function inspectTraceFrame {

@@ -13,7 +13,7 @@ var Variable = function () {
             if (typeof i === 'number' || Object.prototype.toString.call(i) === '[object Number]') {
                 this.i = i;
             } else {
-                throw new TypeError('Unexpected type for field Variable.i: ' + i.toString());
+                throw new TypeError('Unexpected type for field: Variable.i');
             }
         }
         var derived = Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
@@ -29,6 +29,9 @@ var Variable = function () {
             }))));
         return derived.constructor;
     }();
+Variable.prototype.toString = function () {
+    return '_.' + this.i;
+};
 var Cons = function () {
         function Cons$2() {
         }
@@ -73,58 +76,36 @@ var Cons = function () {
 var Nil = Cons.Nil;
 var Pair = Cons.Pair;
 var Substitutions = function () {
-        function Substitutions$2() {
-        }
-        function Empty$2() {
-        }
-        Empty$2.prototype = new Substitutions$2();
-        Empty$2.prototype.constructor = Empty$2;
-        function Substitution$2(u, v, r) {
-            if (!(this instanceof Substitution$2)) {
-                return new Substitution$2(u, v, r);
+        function Substitutions$2(variables) {
+            if (!(this instanceof Substitutions$2)) {
+                return new Substitutions$2(variables);
             }
-            if (u instanceof Variable) {
-                this.u = u;
+            if (Array.isArray ? Array.isArray(variables) : Object.prototype.toString.call(variables) === '[object Array]') {
+                this.variables = variables;
             } else {
-                throw new TypeError('Unexpected type for field Substitutions.Substitution.u: ' + u.toString());
-            }
-            this.v = v;
-            if (r instanceof Substitutions) {
-                this.r = r;
-            } else {
-                throw new TypeError('Unexpected type for field Substitutions.Substitution.r: ' + r.toString());
+                throw new TypeError('Unexpected type for field: Substitutions.variables');
             }
         }
-        Substitution$2.prototype = new Substitutions$2();
-        Substitution$2.prototype.constructor = Substitution$2;
         var derived = Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
                 name: 'Substitutions',
                 constructor: Substitutions$2,
                 prototype: Substitutions$2.prototype,
-                variants: [
-                    {
-                        name: 'Empty',
-                        constructor: Empty$2,
-                        prototype: Empty$2.prototype
-                    },
-                    {
-                        name: 'Substitution',
-                        constructor: Substitution$2,
-                        prototype: Substitution$2.prototype,
-                        fields: [
-                            'u',
-                            'v',
-                            'r'
-                        ]
-                    }
-                ]
+                variants: [{
+                        name: 'Substitutions',
+                        constructor: Substitutions$2,
+                        prototype: Substitutions$2.prototype,
+                        fields: ['variables']
+                    }]
             }))));
-        Substitutions$2.Empty = new derived.variants[0].constructor();
-        Substitutions$2.Substitution = derived.variants[1].constructor;
-        return Substitutions$2;
+        return derived.constructor;
     }();
-var Empty = Substitutions.Empty;
-var Substitution = Substitutions.Substitution;
+Substitutions.prototype.extend = function (v, value) {
+    var variables = this.variables.map(function (x) {
+            return x;
+        });
+    variables[v.i] = value;
+    return Substitutions(variables);
+};
 var State = function () {
         function State$2() {
         }
@@ -135,17 +116,17 @@ var State = function () {
             if (s instanceof Substitutions) {
                 this.s = s;
             } else {
-                throw new TypeError('Unexpected type for field State.Success.s: ' + s.toString());
+                throw new TypeError('Unexpected type for field: State.Success.s');
             }
             if (typeof c === 'number' || Object.prototype.toString.call(c) === '[object Number]') {
                 this.c = c;
             } else {
-                throw new TypeError('Unexpected type for field State.Success.c: ' + c.toString());
+                throw new TypeError('Unexpected type for field: State.Success.c');
             }
             if (Array.isArray ? Array.isArray(t) : Object.prototype.toString.call(t) === '[object Array]') {
                 this.t = t;
             } else {
-                throw new TypeError('Unexpected type for field State.Success.t: ' + t.toString());
+                throw new TypeError('Unexpected type for field: State.Success.t');
             }
         }
         Success$2.prototype = new State$2();
@@ -157,7 +138,7 @@ var State = function () {
             if (Array.isArray ? Array.isArray(t) : Object.prototype.toString.call(t) === '[object Array]') {
                 this.t = t;
             } else {
-                throw new TypeError('Unexpected type for field State.Failure.t: ' + t.toString());
+                throw new TypeError('Unexpected type for field: State.Failure.t');
             }
         }
         Failure$2.prototype = new State$2();
@@ -206,12 +187,12 @@ var TraceFrame = function () {
             if (typeof n === 'string' || Object.prototype.toString.call(n) === '[object String]') {
                 this.n = n;
             } else {
-                throw new TypeError('Unexpected type for field TraceFrame.n: ' + n.toString());
+                throw new TypeError('Unexpected type for field: TraceFrame.n');
             }
             if (s instanceof Substitutions) {
                 this.s = s;
             } else {
-                throw new TypeError('Unexpected type for field TraceFrame.s: ' + s.toString());
+                throw new TypeError('Unexpected type for field: TraceFrame.s');
             }
         }
         var derived = Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
@@ -244,7 +225,7 @@ var Stream = function () {
             if (Object.prototype.toString.call(fn) === '[object Function]') {
                 this.fn = fn;
             } else {
-                throw new TypeError('Unexpected type for field Stream.Thunk.fn: ' + fn.toString());
+                throw new TypeError('Unexpected type for field: Stream.Thunk.fn');
             }
         }
         Thunk$2.prototype = new Stream$2();
@@ -256,12 +237,12 @@ var Stream = function () {
             if (v instanceof State) {
                 this.v = v;
             } else {
-                throw new TypeError('Unexpected type for field Stream.Value.v: ' + v.toString());
+                throw new TypeError('Unexpected type for field: Stream.Value.v');
             }
             if (r instanceof Stream) {
                 this.r = r;
             } else {
-                throw new TypeError('Unexpected type for field Stream.Value.r: ' + r.toString());
+                throw new TypeError('Unexpected type for field: Stream.Value.r');
             }
         }
         Value$2.prototype = new Stream$2();
@@ -304,31 +285,11 @@ var Value = Stream.Value;
 function step(a0, a1) {
     var r0 = Variable.unapply(a0);
     if (r0 != null && r0.length === 1) {
-        if (Empty.hasInstance ? Empty.hasInstance(a1) : a1 instanceof Empty) {
+        var r1 = Substitutions.unapply(a1);
+        if (r1 != null && r1.length === 1) {
             var v = r0[0];
-            return false;
-        }
-        var r1 = Substitution.unapply(a1);
-        if (r1 != null && r1.length === 3) {
-            var r2 = r1[0];
-            var r3 = Variable.unapply(r2);
-            if (r3 != null && (r3.length === 1 && r0[0] == r3[0])) {
-                var v = r0[0];
-                var v2 = r3[0];
-                var val = r1[1];
-                var _ = r1[2];
-                return val;
-            }
-        }
-    }
-    if (Variable.hasInstance ? Variable.hasInstance(a0) : a0 instanceof Variable) {
-        var r4 = Substitution.unapply(a1);
-        if (r4 != null && r4.length === 3) {
-            var v = a0;
-            var _ = r4[1];
-            var _ = r4[1];
-            var ss = r4[2];
-            return step(v, ss);
+            var s = r1[0];
+            return s[v] || false;
         }
     }
     throw new TypeError('No match');
@@ -382,12 +343,12 @@ function unify(a0, a1, a2) {
             if (Variable.hasInstance ? Variable.hasInstance(a0$2) : a0$2 instanceof Variable) {
                 var u$2 = a0$2;
                 var v$2 = a1$2;
-                return Substitution(u$2, v$2, s);
+                return s.extend(u$2, v$2);
             }
             if (Variable.hasInstance ? Variable.hasInstance(a1$2) : a1$2 instanceof Variable) {
                 var u$2 = a0$2;
                 var v$2 = a1$2;
-                return Substitution(v$2, u$2, s);
+                return s.extend(v$2, u$2);
             }
             var r2 = Pair.unapply(a1$2);
             if (r2 != null && r2.length === 2) {
@@ -514,7 +475,7 @@ function take(a0, a1) {
     }
     throw new TypeError('No match');
 }
-var emptyState = Success(Empty, 0, []);
+var emptyState = Success(Substitutions([]), 0, []);
 function call_goal(g) {
     return g(emptyState);
 }
@@ -530,7 +491,7 @@ Cons.prototype.toArray = function () {
         var r0 = Pair.unapply(a0);
         if (r0 != null && r0.length === 2) {
             var r1 = r0[1];
-            if (Pair.hasInstance ? Pair.hasInstance(r1) : r1 instanceof Pair) {
+            if (Cons.hasInstance ? Cons.hasInstance(r1) : r1 instanceof Cons) {
                 var a = r0[0];
                 var d = r1;
                 return [a].concat(d.toArray());
@@ -543,13 +504,9 @@ Cons.prototype.toArray = function () {
     }.call(this, this);
 };
 Substitutions.prototype.toObject = function () {
-    var r = {};
-    var s = this;
-    while (s != Empty) {
-        r[s.u.i] = walkStar(s.u, this);
-        s = s.r;
-    }
-    return r;
+    return this.variables.map(function (i) {
+        return walkStar(i, this).toString();
+    }.bind(this));
 };
 function inspectTraceFrame(a0) {
     var r0 = TraceFrame.unapply(a0);
