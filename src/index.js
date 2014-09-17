@@ -180,43 +180,65 @@ State.prototype.addTrace = function (a0) {
     throw new TypeError('No match');
 };
 var TraceFrame = function () {
-        function TraceFrame$2(n, before, after) {
-            if (!(this instanceof TraceFrame$2)) {
-                return new TraceFrame$2(n, before, after);
+        function TraceFrame$2() {
+        }
+        function Push$2(name, subs) {
+            if (!(this instanceof Push$2)) {
+                return new Push$2(name, subs);
             }
-            if (typeof n === 'string' || Object.prototype.toString.call(n) === '[object String]') {
-                this.n = n;
+            if (typeof name === 'string' || Object.prototype.toString.call(name) === '[object String]') {
+                this.name = name;
             } else {
-                throw new TypeError('Unexpected type for field: TraceFrame.n');
+                throw new TypeError('Unexpected type for field: TraceFrame.Push.name');
             }
-            if (before instanceof Substitutions) {
-                this.before = before;
+            if (subs instanceof Substitutions) {
+                this.subs = subs;
             } else {
-                throw new TypeError('Unexpected type for field: TraceFrame.before');
-            }
-            if (after instanceof Substitutions) {
-                this.after = after;
-            } else {
-                throw new TypeError('Unexpected type for field: TraceFrame.after');
+                throw new TypeError('Unexpected type for field: TraceFrame.Push.subs');
             }
         }
+        Push$2.prototype = new TraceFrame$2();
+        Push$2.prototype.constructor = Push$2;
+        function Pop$2(subs) {
+            if (!(this instanceof Pop$2)) {
+                return new Pop$2(subs);
+            }
+            if (subs instanceof Substitutions) {
+                this.subs = subs;
+            } else {
+                throw new TypeError('Unexpected type for field: TraceFrame.Pop.subs');
+            }
+        }
+        Pop$2.prototype = new TraceFrame$2();
+        Pop$2.prototype.constructor = Pop$2;
         var derived = Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
                 name: 'TraceFrame',
                 constructor: TraceFrame$2,
                 prototype: TraceFrame$2.prototype,
-                variants: [{
-                        name: 'TraceFrame',
-                        constructor: TraceFrame$2,
-                        prototype: TraceFrame$2.prototype,
+                variants: [
+                    {
+                        name: 'Push',
+                        constructor: Push$2,
+                        prototype: Push$2.prototype,
                         fields: [
-                            'n',
-                            'before',
-                            'after'
+                            'name',
+                            'subs'
                         ]
-                    }]
+                    },
+                    {
+                        name: 'Pop',
+                        constructor: Pop$2,
+                        prototype: Pop$2.prototype,
+                        fields: ['subs']
+                    }
+                ]
             }))));
-        return derived.constructor;
+        TraceFrame$2.Push = derived.variants[0].constructor;
+        TraceFrame$2.Pop = derived.variants[1].constructor;
+        return TraceFrame$2;
     }();
+var Push = TraceFrame.Push;
+var Pop = TraceFrame.Pop;
 var Stream = function () {
         function Stream$2() {
         }
@@ -514,13 +536,11 @@ Substitutions.prototype.toObject = function () {
         return walkStar(i, this).toString();
     }.bind(this));
 };
+// fixme: actual push/pop handling with indentation
 function inspectTraceFrame(a0) {
-    var r0 = TraceFrame.unapply(a0);
-    if (r0 != null && r0.length === 3) {
-        var name = r0[0];
-        var before = r0[1];
-        var after = r0[2];
-        return name + ': ' + require('util').inspect(before.toObject()) + ' => ' + require('util').inspect(after.toObject());
+    if (TraceFrame.hasInstance ? TraceFrame.hasInstance(a0) : a0 instanceof TraceFrame) {
+        var t = a0;
+        return t.toString();
     }
     throw new TypeError('No match');
 }
@@ -565,41 +585,41 @@ function runTrace(n, goal) {
 }
 /* Tracing goals */
 function trace(name, goal) {
-    return function (st) {
-        return traceStream(goal(st), name, st);
+    return function (a0) {
+        if (Failure.hasInstance ? Failure.hasInstance(a0) : a0 instanceof Failure) {
+            var f = a0;
+            return goal(f);
+        }
+        if (Success.hasInstance ? Success.hasInstance(a0) : a0 instanceof Success) {
+            var s = a0;
+            return traceStream(goal(s.addTrace(Push(name, s.s))));
+        }
+        throw new TypeError('No match');
     };
 }
-function traceStream(a0, a1, a2) {
+function traceStream(a0) {
     if (Done.hasInstance ? Done.hasInstance(a0) : a0 instanceof Done) {
-        var _ = a2;
-        var _ = a2;
         return Done;
     }
     var r0 = Thunk.unapply(a0);
-    if (r0 != null && (r0.length === 1 && (State.hasInstance ? State.hasInstance(a2) : a2 instanceof State))) {
+    if (r0 != null && r0.length === 1) {
         var t = r0[0];
-        var n = a1;
-        var s = a2;
         return Thunk(function () {
-            return traceStream(t(), n, s);
+            return traceStream(t());
         });
     }
     var r1 = Value.unapply(a0);
     if (r1 != null && r1.length === 2) {
         var r2 = r1[0];
-        if ((Failure.hasInstance ? Failure.hasInstance(r2) : r2 instanceof Failure) && (State.hasInstance ? State.hasInstance(a2) : a2 instanceof State)) {
+        if (Failure.hasInstance ? Failure.hasInstance(r2) : r2 instanceof Failure) {
             var f = r2;
             var rest = r1[1];
-            var n = a1;
-            var st = a2;
-            return Value(f, rest);
+            return Value(f, Done);
         }
-        if ((Success.hasInstance ? Success.hasInstance(r2) : r2 instanceof Success) && (State.hasInstance ? State.hasInstance(a2) : a2 instanceof State)) {
+        if (State.hasInstance ? State.hasInstance(r2) : r2 instanceof State) {
             var s = r2;
             var rest = r1[1];
-            var n = a1;
-            var st = a2;
-            return Value(s.addTrace(TraceFrame(n, st.s, s.s)), traceStream(rest, n, st));
+            return Value(s.addTrace(Pop(s.s)), traceStream(rest));
         }
     }
     throw new TypeError('No match');

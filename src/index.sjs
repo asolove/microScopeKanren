@@ -50,10 +50,14 @@ State.prototype.addTrace = function {
 	t@TraceFrame => this.set({t: this.t.concat([t])})
 }
 
-data TraceFrame {
-	n: String,
-	before: Substitutions,
-	after: Substitutions
+union TraceFrame {
+	Push {
+		name: String,
+		subs: Substitutions
+	},
+	Pop {
+		subs: Substitutions
+	}
 } deriving (Eq, Clone, ToString, Extractor)
 
 union Stream {
@@ -168,10 +172,9 @@ Substitutions.prototype.toObject = function() {
 	}.bind(this));
 }
 
+// fixme: actual push/pop handling with indentation
 function inspectTraceFrame {
-	TraceFrame(name, before, after) => 
-		name + ": " + require("util").inspect(before.toObject()) + 
-		" => " + require("util").inspect(after.toObject());
+	t@TraceFrame => t.toString();
 }
 
 function inspectTrace(states) {
@@ -204,18 +207,17 @@ function runTrace(n, goal) {
 
 /* Tracing goals */
 function trace(name, goal) {
-	return function(st) {
-		return traceStream(goal(st), name, st);
+	return function {
+		f@Failure => goal(f),
+		s@Success => traceStream(goal(s.addTrace(Push(name, s.s))))
 	}
 }
 
 function traceStream {
-	(Done, _, _) => Done,
-	(Thunk(t), n, s@State) => Thunk(function(){ return traceStream(t(), n, s) }),
-	(Value(f@Failure, rest), n, st@State) => Value(f, rest),
-	(Value(s@Success, rest), n, st@State) => 
-		Value(s.addTrace(TraceFrame(n, st.s, s.s)),
-			traceStream(rest, n, st))
+	Done => Done,
+	Thunk(t) => Thunk(function(){ return traceStream(t()) }),
+	Value(f@Failure, rest) => Value(f, Done), // add trace info?
+	Value(s@State, rest) => Value(s.addTrace(Pop(s.s)), traceStream(rest))
 }
 
 
