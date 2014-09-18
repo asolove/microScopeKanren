@@ -294,7 +294,8 @@ function traceToStack(frames) {
 			stack.unshift(trace);
 		},
 		Pop(subs) => {
-			lastFrame = stack.shift().set({after: subs});
+			lastFrame = stack.shift();
+			lastFrame.after = subs; // more mutattion, sorry
 		}
 	});
 	return lastFrame;
@@ -308,7 +309,7 @@ var AnswerInspector = React.createClass({displayName: 'AnswerInspector',
 	    this.props.answers.map(function(state){
 	    	var stack = traceToStack(state.t);
 	      return React.DOM.div(null,
-	        React.DOM.h2(null, "Answer: ", reifyFirst(state.s)),
+	        React.DOM.h2(null, "Answer: ", reifyFirst(state.s).toString()),
 	        stack && TraceStackInspector({stack: traceToStack(state.t)})
 	      );
 	    })
@@ -323,12 +324,16 @@ var TraceStackInspector = React.createClass({displayName: 'TraceStackInspector',
     });
 
     return React.DOM.div({className: "stack"},
-      React.DOM.span({class: "name"}, this.props.stack.name),
-      React.DOM.div({className: "before"},
-        SubstitutionTable({subs: this.props.stack.before})
-      ),
-      React.DOM.div({className: "after"},
-        SubstitutionTable({subs: this.props.stack.after})
+      React.DOM.span({className: "name"}, this.props.stack.name),
+      React.DOM.div({className: "substitutions"},
+	      React.DOM.div({className: "before"},
+	      	React.DOM.strong(null, "Before"),
+	        SubstitutionTable({subs: this.props.stack.before})
+	      ),
+	      React.DOM.div({className: "after"},
+	      	React.DOM.strong(null, "After"),
+	        SubstitutionTable({subs: this.props.stack.after})
+	      )
       ),
       children.length > 0 && React.DOM.div({className: "children"}, children)
     );
@@ -341,7 +346,7 @@ var SubstitutionTable = React.createClass({displayName: 'SubstitutionTable',
     var rows = subs.variables.map(function(value, i){
       return React.DOM.tr(null,
                 React.DOM.th(null, i),
-                React.DOM.td(null, walkStar(Variable(i), subs))
+                React.DOM.td(null, walkStar(Variable(i), subs).toString())
             );
     });
     return React.DOM.table({class: "substitutions"},

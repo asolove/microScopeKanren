@@ -3,16 +3,28 @@
 <head>
   <title>Visualizing appendo</title>
   <style>
-    body { font: 14px/1.4 helvetica; width: 600px; margin: 20px auto;}
+    body { font: 14px/1.4 helvetica; width: 600px; margin: 20px auto 300px;}
     .stack {
       padding: 5px; 
       background-color: rgba(100,200,100,0.1);
-      border: 1px solid rgba(100,200,100,0.4);
       color: #555;
     }
-    .stack .name { margin-bottom}
+    .stack .name { margin-bottom: 4px; cursor: pointer;}
     .stack .children { margin-left: 30px; }
-    .before, .after { display: none; }
+    .substitutions { display: none; }
+
+    .name:hover + .substitutions {
+      background: white;
+      border: 1px solid rgba(100,200,100,0.4);
+      display: block;
+      position: absolute;
+      padding: 10px;
+    }
+    .after, .before { 
+      width: inherent-width;
+      float: left;
+    }
+
   </style>
 </head>
 <body>

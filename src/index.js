@@ -19698,7 +19698,8 @@ function traceToStack$2577(frames$2802) {
         var r1$2810 = Pop$2499.unapply(a0$2808);
         if (r1$2810 != null && r1$2810.length === 1) {
             var subs$2812 = r1$2810[0];
-            lastFrame$2804 = stack$2803.shift().set({ after: subs$2812 });
+            lastFrame$2804 = stack$2803.shift();
+            lastFrame$2804.after = subs$2812;
             return;
         }
         throw new TypeError('No match');
@@ -19711,7 +19712,7 @@ var AnswerInspector$2579 = React$2578.createClass({
         render: function () {
             return React$2578.DOM.div(null, this.props.answers.map(function (state$2816) {
                 var stack$2817 = traceToStack$2577(state$2816.t);
-                return React$2578.DOM.div(null, React$2578.DOM.h2(null, 'Answer: ', reifyFirst$2553(state$2816.s)), stack$2817 && TraceStackInspector$2580({ stack: traceToStack$2577(state$2816.t) }));
+                return React$2578.DOM.div(null, React$2578.DOM.h2(null, 'Answer: ', reifyFirst$2553(state$2816.s).toString()), stack$2817 && TraceStackInspector$2580({ stack: traceToStack$2577(state$2816.t) }));
             }));
         }
     });
@@ -19721,7 +19722,7 @@ var TraceStackInspector$2580 = React$2578.createClass({
             var children$2820 = this.props.stack.children.map(function (child$2821) {
                     return TraceStackInspector$2580({ stack: child$2821 });
                 });
-            return React$2578.DOM.div({ className: 'stack' }, React$2578.DOM.span({ class: 'name' }, this.props.stack.name), React$2578.DOM.div({ className: 'before' }, SubstitutionTable$2581({ subs: this.props.stack.before })), React$2578.DOM.div({ className: 'after' }, SubstitutionTable$2581({ subs: this.props.stack.after })), children$2820.length > 0 && React$2578.DOM.div({ className: 'children' }, children$2820));
+            return React$2578.DOM.div({ className: 'stack' }, React$2578.DOM.span({ className: 'name' }, this.props.stack.name), React$2578.DOM.div({ className: 'substitutions' }, React$2578.DOM.div({ className: 'before' }, React$2578.DOM.strong(null, 'Before'), SubstitutionTable$2581({ subs: this.props.stack.before })), React$2578.DOM.div({ className: 'after' }, React$2578.DOM.strong(null, 'After'), SubstitutionTable$2581({ subs: this.props.stack.after }))), children$2820.length > 0 && React$2578.DOM.div({ className: 'children' }, children$2820));
         }
     });
 var SubstitutionTable$2581 = React$2578.createClass({
@@ -19729,7 +19730,7 @@ var SubstitutionTable$2581 = React$2578.createClass({
         render: function () {
             var subs$2823 = this.props.subs;
             var rows$2825 = subs$2823.variables.map(function (value$2826, i$2827) {
-                    return React$2578.DOM.tr(null, React$2578.DOM.th(null, i$2827), React$2578.DOM.td(null, walkStar$2555(Variable$2472(i$2827), subs$2823)));
+                    return React$2578.DOM.tr(null, React$2578.DOM.th(null, i$2827), React$2578.DOM.td(null, walkStar$2555(Variable$2472(i$2827), subs$2823).toString()));
                 });
             return React$2578.DOM.table({ class: 'substitutions' }, rows$2825);
         }
