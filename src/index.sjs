@@ -304,4 +304,47 @@ function traceToStack(frames) {
 	return lastFrame;
 }
 
-console.log(traceToStack(appendoTrace[3].t));
+
+var AnswerInspector = React.createClass({
+	render: function(){
+		return this.props.answers.map(function(state){
+			return <div>
+				<h2>Answer: {reifyFirst(state)}</h2>
+				<TraceStackInspector stack={traceToStack(state.t)}/>
+			</div>;
+		});
+	}
+})
+
+var TraceStackInspector = React.createClass({
+	render: function() {
+		var children = this.props.stack.children.map(TrackStackInspector);
+
+		return <div className="stack">
+			<span class="name">{this.props.stack.name}</span>
+			<div className="before">
+				<SubstitutionTable subs={this.props.stack.before} />
+			</div>
+			<div className="after">
+				<SubstitutionTable subs={this.props.stack.after} />
+			</div>
+			<div className="children">{children}</div>
+		</div>;
+	}
+});
+
+var SubstitutionTable = React.createClass({
+	render: function() {
+		rows = this.props.subs.variables.map(function(value, i){
+			return <tr>
+								<th>{i}</th>
+								<td>{walkStar(Variable(i), subs)}</td>
+						</tr>;
+		});
+		return <table class="substitutions">
+			{rows}
+		</table>
+	}
+});
+
+React.renderComponent(AnswerInspector, { answers: appendoTrace });
