@@ -18982,68 +18982,68 @@ module.exports = require('./lib/React');
 },{"./lib/React":29}],147:[function(require,module,exports){
 // microKanren, (c) Jason Hemann and Dan Friedman
 // JS implementation and tracing support by Adam Solove
-var Clone$2464 = require('adt-simple').Clone;
-var Eq$2465 = require('adt-simple').Eq;
-var Extractor$2466 = require('adt-simple').Extractor;
-var Setter$2467 = require('adt-simple').Setter;
-var ToString$2468 = require('adt-simple').ToString;
-var Variable$2474 = function () {
-        function Variable$2584(i$2586) {
-            if (!(this instanceof Variable$2584)) {
-                return new Variable$2584(i$2586);
+var Clone$2466 = require('adt-simple').Clone;
+var Eq$2467 = require('adt-simple').Eq;
+var Extractor$2468 = require('adt-simple').Extractor;
+var Setter$2469 = require('adt-simple').Setter;
+var ToString$2470 = require('adt-simple').ToString;
+var Variable$2476 = function () {
+        function Variable$2586(i$2588) {
+            if (!(this instanceof Variable$2586)) {
+                return new Variable$2586(i$2588);
             }
-            if (typeof i$2586 === 'number' || Object.prototype.toString.call(i$2586) === '[object Number]') {
-                this.i = i$2586;
+            if (typeof i$2588 === 'number' || Object.prototype.toString.call(i$2588) === '[object Number]') {
+                this.i = i$2588;
             } else {
                 throw new TypeError('Unexpected type for field: Variable.i');
             }
         }
-        var derived$2585 = Extractor$2466.derive(ToString$2468.derive(Clone$2464.derive(Eq$2465.derive({
+        var derived$2587 = Extractor$2468.derive(ToString$2470.derive(Clone$2466.derive(Eq$2467.derive({
                 name: 'Variable',
-                constructor: Variable$2584,
-                prototype: Variable$2584.prototype,
+                constructor: Variable$2586,
+                prototype: Variable$2586.prototype,
                 variants: [{
                         name: 'Variable',
-                        constructor: Variable$2584,
-                        prototype: Variable$2584.prototype,
+                        constructor: Variable$2586,
+                        prototype: Variable$2586.prototype,
                         fields: ['i']
                     }]
             }))));
-        return derived$2585.constructor;
+        return derived$2587.constructor;
     }();
-Variable$2474.prototype.toString = function () {
+Variable$2476.prototype.toString = function () {
     return '_.' + this.i;
 };
-var Cons$2479 = function () {
-        function Cons$2587() {
+var Cons$2481 = function () {
+        function Cons$2589() {
         }
-        function Nil$2588() {
+        function Nil$2590() {
         }
-        Nil$2588.prototype = new Cons$2587();
-        Nil$2588.prototype.constructor = Nil$2588;
-        function Pair$2589(a$2591, d$2592) {
-            if (!(this instanceof Pair$2589)) {
-                return new Pair$2589(a$2591, d$2592);
+        Nil$2590.prototype = new Cons$2589();
+        Nil$2590.prototype.constructor = Nil$2590;
+        function Pair$2591(a$2593, d$2594) {
+            if (!(this instanceof Pair$2591)) {
+                return new Pair$2591(a$2593, d$2594);
             }
-            this.a = a$2591;
-            this.d = d$2592;
+            this.a = a$2593;
+            this.d = d$2594;
         }
-        Pair$2589.prototype = new Cons$2587();
-        Pair$2589.prototype.constructor = Pair$2589;
-        var derived$2590 = Extractor$2466.derive(Clone$2464.derive(Eq$2465.derive({
+        Pair$2591.prototype = new Cons$2589();
+        Pair$2591.prototype.constructor = Pair$2591;
+        var derived$2592 = Extractor$2468.derive(Clone$2466.derive(Eq$2467.derive({
                 name: 'Cons',
-                constructor: Cons$2587,
-                prototype: Cons$2587.prototype,
+                constructor: Cons$2589,
+                prototype: Cons$2589.prototype,
                 variants: [
                     {
                         name: 'Nil',
-                        constructor: Nil$2588,
-                        prototype: Nil$2588.prototype
+                        constructor: Nil$2590,
+                        prototype: Nil$2590.prototype
                     },
                     {
                         name: 'Pair',
-                        constructor: Pair$2589,
-                        prototype: Pair$2589.prototype,
+                        constructor: Pair$2591,
+                        prototype: Pair$2591.prototype,
                         fields: [
                             'a',
                             'd'
@@ -19051,89 +19051,89 @@ var Cons$2479 = function () {
                     }
                 ]
             })));
-        Cons$2587.Nil = new derived$2590.variants[0].constructor();
-        Cons$2587.Pair = derived$2590.variants[1].constructor;
-        return Cons$2587;
+        Cons$2589.Nil = new derived$2592.variants[0].constructor();
+        Cons$2589.Pair = derived$2592.variants[1].constructor;
+        return Cons$2589;
     }();
-var Nil$2480 = Cons$2479.Nil;
-var Pair$2481 = Cons$2479.Pair;
-var Substitutions$2485 = function () {
-        function Substitutions$2593(variables$2595) {
-            if (!(this instanceof Substitutions$2593)) {
-                return new Substitutions$2593(variables$2595);
+var Nil$2482 = Cons$2481.Nil;
+var Pair$2483 = Cons$2481.Pair;
+var Substitutions$2487 = function () {
+        function Substitutions$2595(variables$2597) {
+            if (!(this instanceof Substitutions$2595)) {
+                return new Substitutions$2595(variables$2597);
             }
-            if (Array.isArray ? Array.isArray(variables$2595) : Object.prototype.toString.call(variables$2595) === '[object Array]') {
-                this.variables = variables$2595;
+            if (Array.isArray ? Array.isArray(variables$2597) : Object.prototype.toString.call(variables$2597) === '[object Array]') {
+                this.variables = variables$2597;
             } else {
                 throw new TypeError('Unexpected type for field: Substitutions.variables');
             }
         }
-        var derived$2594 = Extractor$2466.derive(ToString$2468.derive(Clone$2464.derive(Eq$2465.derive({
+        var derived$2596 = Extractor$2468.derive(ToString$2470.derive(Clone$2466.derive(Eq$2467.derive({
                 name: 'Substitutions',
-                constructor: Substitutions$2593,
-                prototype: Substitutions$2593.prototype,
+                constructor: Substitutions$2595,
+                prototype: Substitutions$2595.prototype,
                 variants: [{
                         name: 'Substitutions',
-                        constructor: Substitutions$2593,
-                        prototype: Substitutions$2593.prototype,
+                        constructor: Substitutions$2595,
+                        prototype: Substitutions$2595.prototype,
                         fields: ['variables']
                     }]
             }))));
-        return derived$2594.constructor;
+        return derived$2596.constructor;
     }();
-Substitutions$2485.prototype.extend = function (v$2596, value$2597) {
-    var variables$2599 = this.variables.map(function (x$2600) {
-            return x$2600;
+Substitutions$2487.prototype.extend = function (v$2598, value$2599) {
+    var variables$2601 = this.variables.map(function (x$2602) {
+            return x$2602;
         });
-    variables$2599[v$2596.i] = value$2597;
-    return Substitutions$2485(variables$2599);
+    variables$2601[v$2598.i] = value$2599;
+    return Substitutions$2487(variables$2601);
 };
-var State$2490 = function () {
-        function State$2601() {
+var State$2492 = function () {
+        function State$2603() {
         }
-        function Success$2602(s$2605, c$2606, t$2607) {
-            if (!(this instanceof Success$2602)) {
-                return new Success$2602(s$2605, c$2606, t$2607);
+        function Success$2604(s$2607, c$2608, t$2609) {
+            if (!(this instanceof Success$2604)) {
+                return new Success$2604(s$2607, c$2608, t$2609);
             }
-            if (s$2605 instanceof Substitutions$2485) {
-                this.s = s$2605;
+            if (s$2607 instanceof Substitutions$2487) {
+                this.s = s$2607;
             } else {
                 throw new TypeError('Unexpected type for field: State.Success.s');
             }
-            if (typeof c$2606 === 'number' || Object.prototype.toString.call(c$2606) === '[object Number]') {
-                this.c = c$2606;
+            if (typeof c$2608 === 'number' || Object.prototype.toString.call(c$2608) === '[object Number]') {
+                this.c = c$2608;
             } else {
                 throw new TypeError('Unexpected type for field: State.Success.c');
             }
-            if (Array.isArray ? Array.isArray(t$2607) : Object.prototype.toString.call(t$2607) === '[object Array]') {
-                this.t = t$2607;
+            if (Array.isArray ? Array.isArray(t$2609) : Object.prototype.toString.call(t$2609) === '[object Array]') {
+                this.t = t$2609;
             } else {
                 throw new TypeError('Unexpected type for field: State.Success.t');
             }
         }
-        Success$2602.prototype = new State$2601();
-        Success$2602.prototype.constructor = Success$2602;
-        function Failure$2603(t$2608) {
-            if (!(this instanceof Failure$2603)) {
-                return new Failure$2603(t$2608);
+        Success$2604.prototype = new State$2603();
+        Success$2604.prototype.constructor = Success$2604;
+        function Failure$2605(t$2610) {
+            if (!(this instanceof Failure$2605)) {
+                return new Failure$2605(t$2610);
             }
-            if (Array.isArray ? Array.isArray(t$2608) : Object.prototype.toString.call(t$2608) === '[object Array]') {
-                this.t = t$2608;
+            if (Array.isArray ? Array.isArray(t$2610) : Object.prototype.toString.call(t$2610) === '[object Array]') {
+                this.t = t$2610;
             } else {
                 throw new TypeError('Unexpected type for field: State.Failure.t');
             }
         }
-        Failure$2603.prototype = new State$2601();
-        Failure$2603.prototype.constructor = Failure$2603;
-        var derived$2604 = Setter$2467.derive(Extractor$2466.derive(ToString$2468.derive(Clone$2464.derive(Eq$2465.derive({
+        Failure$2605.prototype = new State$2603();
+        Failure$2605.prototype.constructor = Failure$2605;
+        var derived$2606 = Setter$2469.derive(Extractor$2468.derive(ToString$2470.derive(Clone$2466.derive(Eq$2467.derive({
                 name: 'State',
-                constructor: State$2601,
-                prototype: State$2601.prototype,
+                constructor: State$2603,
+                prototype: State$2603.prototype,
                 variants: [
                     {
                         name: 'Success',
-                        constructor: Success$2602,
-                        prototype: Success$2602.prototype,
+                        constructor: Success$2604,
+                        prototype: Success$2604.prototype,
                         fields: [
                             's',
                             'c',
@@ -19142,141 +19142,147 @@ var State$2490 = function () {
                     },
                     {
                         name: 'Failure',
-                        constructor: Failure$2603,
-                        prototype: Failure$2603.prototype,
+                        constructor: Failure$2605,
+                        prototype: Failure$2605.prototype,
                         fields: ['t']
                     }
                 ]
             })))));
-        State$2601.Success = derived$2604.variants[0].constructor;
-        State$2601.Failure = derived$2604.variants[1].constructor;
-        return State$2601;
+        State$2603.Success = derived$2606.variants[0].constructor;
+        State$2603.Failure = derived$2606.variants[1].constructor;
+        return State$2603;
     }();
-var Success$2491 = State$2490.Success;
-var Failure$2492 = State$2490.Failure;
-State$2490.prototype.addTrace = function (a0$2609) {
-    if (TraceFrame$2499.hasInstance ? TraceFrame$2499.hasInstance(a0$2609) : a0$2609 instanceof TraceFrame$2499) {
-        var t$2610 = a0$2609;
-        return this.set({ t: this.t.concat([t$2610]) });
+var Success$2493 = State$2492.Success;
+var Failure$2494 = State$2492.Failure;
+State$2492.prototype.addTrace = function (a0$2611) {
+    if (TraceFrame$2501.hasInstance ? TraceFrame$2501.hasInstance(a0$2611) : a0$2611 instanceof TraceFrame$2501) {
+        var t$2612 = a0$2611;
+        return this.set({ t: this.t.concat([t$2612]) });
     }
     throw new TypeError('No match');
 };
-var TraceFrame$2499 = function () {
-        function TraceFrame$2611() {
+var TraceFrame$2501 = function () {
+        function TraceFrame$2613() {
         }
-        function Push$2612(name$2615, subs$2616) {
-            if (!(this instanceof Push$2612)) {
-                return new Push$2612(name$2615, subs$2616);
+        function Push$2614(name$2617, subs$2618, variables$2619) {
+            if (!(this instanceof Push$2614)) {
+                return new Push$2614(name$2617, subs$2618, variables$2619);
             }
-            if (typeof name$2615 === 'string' || Object.prototype.toString.call(name$2615) === '[object String]') {
-                this.name = name$2615;
+            if (typeof name$2617 === 'string' || Object.prototype.toString.call(name$2617) === '[object String]') {
+                this.name = name$2617;
             } else {
                 throw new TypeError('Unexpected type for field: TraceFrame.Push.name');
             }
-            if (subs$2616 instanceof Substitutions$2485) {
-                this.subs = subs$2616;
+            if (subs$2618 instanceof Substitutions$2487) {
+                this.subs = subs$2618;
             } else {
                 throw new TypeError('Unexpected type for field: TraceFrame.Push.subs');
             }
-        }
-        Push$2612.prototype = new TraceFrame$2611();
-        Push$2612.prototype.constructor = Push$2612;
-        function Pop$2613(subs$2617) {
-            if (!(this instanceof Pop$2613)) {
-                return new Pop$2613(subs$2617);
+            if (variables$2619 != null && (variables$2619 = Object(variables$2619))) {
+                this.variables = variables$2619;
+            } else {
+                throw new TypeError('Unexpected type for field: TraceFrame.Push.variables');
             }
-            if (subs$2617 instanceof Substitutions$2485) {
-                this.subs = subs$2617;
+        }
+        Push$2614.prototype = new TraceFrame$2613();
+        Push$2614.prototype.constructor = Push$2614;
+        function Pop$2615(subs$2620) {
+            if (!(this instanceof Pop$2615)) {
+                return new Pop$2615(subs$2620);
+            }
+            if (subs$2620 instanceof Substitutions$2487) {
+                this.subs = subs$2620;
             } else {
                 throw new TypeError('Unexpected type for field: TraceFrame.Pop.subs');
             }
         }
-        Pop$2613.prototype = new TraceFrame$2611();
-        Pop$2613.prototype.constructor = Pop$2613;
-        var derived$2614 = Extractor$2466.derive(ToString$2468.derive(Clone$2464.derive(Eq$2465.derive({
+        Pop$2615.prototype = new TraceFrame$2613();
+        Pop$2615.prototype.constructor = Pop$2615;
+        var derived$2616 = Extractor$2468.derive(ToString$2470.derive(Clone$2466.derive(Eq$2467.derive({
                 name: 'TraceFrame',
-                constructor: TraceFrame$2611,
-                prototype: TraceFrame$2611.prototype,
+                constructor: TraceFrame$2613,
+                prototype: TraceFrame$2613.prototype,
                 variants: [
                     {
                         name: 'Push',
-                        constructor: Push$2612,
-                        prototype: Push$2612.prototype,
+                        constructor: Push$2614,
+                        prototype: Push$2614.prototype,
                         fields: [
                             'name',
-                            'subs'
+                            'subs',
+                            'variables'
                         ]
                     },
                     {
                         name: 'Pop',
-                        constructor: Pop$2613,
-                        prototype: Pop$2613.prototype,
+                        constructor: Pop$2615,
+                        prototype: Pop$2615.prototype,
                         fields: ['subs']
                     }
                 ]
             }))));
-        TraceFrame$2611.Push = derived$2614.variants[0].constructor;
-        TraceFrame$2611.Pop = derived$2614.variants[1].constructor;
-        return TraceFrame$2611;
+        TraceFrame$2613.Push = derived$2616.variants[0].constructor;
+        TraceFrame$2613.Pop = derived$2616.variants[1].constructor;
+        return TraceFrame$2613;
     }();
-var Push$2500 = TraceFrame$2499.Push;
-var Pop$2501 = TraceFrame$2499.Pop;
-var Stream$2505 = function () {
-        function Stream$2618() {
+var Push$2502 = TraceFrame$2501.Push;
+var Pop$2503 = TraceFrame$2501.Pop;
+var Stream$2507 = function () {
+        function Stream$2621() {
         }
-        function Done$2619() {
+        function Done$2622() {
         }
-        Done$2619.prototype = new Stream$2618();
-        Done$2619.prototype.constructor = Done$2619;
-        function Thunk$2620(fn$2623) {
-            if (!(this instanceof Thunk$2620)) {
-                return new Thunk$2620(fn$2623);
+        Done$2622.prototype = new Stream$2621();
+        Done$2622.prototype.constructor = Done$2622;
+        function Thunk$2623(fn$2626) {
+            if (!(this instanceof Thunk$2623)) {
+                return new Thunk$2623(fn$2626);
             }
-            if (Object.prototype.toString.call(fn$2623) === '[object Function]') {
-                this.fn = fn$2623;
+            if (Object.prototype.toString.call(fn$2626) === '[object Function]') {
+                this.fn = fn$2626;
             } else {
                 throw new TypeError('Unexpected type for field: Stream.Thunk.fn');
             }
         }
-        Thunk$2620.prototype = new Stream$2618();
-        Thunk$2620.prototype.constructor = Thunk$2620;
-        function Value$2621(v$2624, r$2625) {
-            if (!(this instanceof Value$2621)) {
-                return new Value$2621(v$2624, r$2625);
+        Thunk$2623.prototype = new Stream$2621();
+        Thunk$2623.prototype.constructor = Thunk$2623;
+        function Value$2624(v$2627, r$2628) {
+            if (!(this instanceof Value$2624)) {
+                return new Value$2624(v$2627, r$2628);
             }
-            if (v$2624 instanceof State$2490) {
-                this.v = v$2624;
+            if (v$2627 instanceof State$2492) {
+                this.v = v$2627;
             } else {
                 throw new TypeError('Unexpected type for field: Stream.Value.v');
             }
-            if (r$2625 instanceof Stream$2505) {
-                this.r = r$2625;
+            if (r$2628 instanceof Stream$2507) {
+                this.r = r$2628;
             } else {
                 throw new TypeError('Unexpected type for field: Stream.Value.r');
             }
         }
-        Value$2621.prototype = new Stream$2618();
-        Value$2621.prototype.constructor = Value$2621;
-        var derived$2622 = Extractor$2466.derive(ToString$2468.derive(Clone$2464.derive(Eq$2465.derive({
+        Value$2624.prototype = new Stream$2621();
+        Value$2624.prototype.constructor = Value$2624;
+        var derived$2625 = Extractor$2468.derive(ToString$2470.derive(Clone$2466.derive(Eq$2467.derive({
                 name: 'Stream',
-                constructor: Stream$2618,
-                prototype: Stream$2618.prototype,
+                constructor: Stream$2621,
+                prototype: Stream$2621.prototype,
                 variants: [
                     {
                         name: 'Done',
-                        constructor: Done$2619,
-                        prototype: Done$2619.prototype
+                        constructor: Done$2622,
+                        prototype: Done$2622.prototype
                     },
                     {
                         name: 'Thunk',
-                        constructor: Thunk$2620,
-                        prototype: Thunk$2620.prototype,
+                        constructor: Thunk$2623,
+                        prototype: Thunk$2623.prototype,
                         fields: ['fn']
                     },
                     {
                         name: 'Value',
-                        constructor: Value$2621,
-                        prototype: Value$2621.prototype,
+                        constructor: Value$2624,
+                        prototype: Value$2624.prototype,
                         fields: [
                             'v',
                             'r'
@@ -19284,466 +19290,489 @@ var Stream$2505 = function () {
                     }
                 ]
             }))));
-        Stream$2618.Done = new derived$2622.variants[0].constructor();
-        Stream$2618.Thunk = derived$2622.variants[1].constructor;
-        Stream$2618.Value = derived$2622.variants[2].constructor;
-        return Stream$2618;
+        Stream$2621.Done = new derived$2625.variants[0].constructor();
+        Stream$2621.Thunk = derived$2625.variants[1].constructor;
+        Stream$2621.Value = derived$2625.variants[2].constructor;
+        return Stream$2621;
     }();
-var Done$2506 = Stream$2505.Done;
-var Thunk$2507 = Stream$2505.Thunk;
-var Value$2508 = Stream$2505.Value;
-function step$2515(a0$2626, a1$2627) {
-    var r0$2628 = Variable$2474.unapply(a0$2626);
-    if (r0$2628 != null && r0$2628.length === 1) {
-        var r1$2629 = Substitutions$2485.unapply(a1$2627);
-        if (r1$2629 != null && r1$2629.length === 1) {
-            var v$2630 = r0$2628[0];
-            var s$2631 = r1$2629[0];
-            return s$2631[v$2630] || false;
+var Done$2508 = Stream$2507.Done;
+var Thunk$2509 = Stream$2507.Thunk;
+var Value$2510 = Stream$2507.Value;
+function step$2517(a0$2629, a1$2630) {
+    var r0$2631 = Variable$2476.unapply(a0$2629);
+    if (r0$2631 != null && r0$2631.length === 1) {
+        var r1$2632 = Substitutions$2487.unapply(a1$2630);
+        if (r1$2632 != null && r1$2632.length === 1) {
+            var v$2633 = r0$2631[0];
+            var s$2634 = r1$2632[0];
+            return s$2634[v$2633] || false;
         }
     }
     throw new TypeError('No match');
 }
-function walk$2517(a0$2632, a1$2633) {
-    if ((Variable$2474.hasInstance ? Variable$2474.hasInstance(a0$2632) : a0$2632 instanceof Variable$2474) && (Substitutions$2485.hasInstance ? Substitutions$2485.hasInstance(a1$2633) : a1$2633 instanceof Substitutions$2485)) {
-        var v$2634 = a0$2632;
-        var s$2636 = a1$2633;
-        return function (a0$2640) {
-            if (a0$2640 === false) {
-                return v$2634;
+function walk$2519(a0$2635, a1$2636) {
+    if ((Variable$2476.hasInstance ? Variable$2476.hasInstance(a0$2635) : a0$2635 instanceof Variable$2476) && (Substitutions$2487.hasInstance ? Substitutions$2487.hasInstance(a1$2636) : a1$2636 instanceof Substitutions$2487)) {
+        var v$2637 = a0$2635;
+        var s$2639 = a1$2636;
+        return function (a0$2643) {
+            if (a0$2643 === false) {
+                return v$2637;
             }
-            if (Variable$2474.hasInstance ? Variable$2474.hasInstance(a0$2640) : a0$2640 instanceof Variable$2474) {
-                var v2$2642 = a0$2640;
-                return walk$2517(v2$2642, s$2636);
+            if (Variable$2476.hasInstance ? Variable$2476.hasInstance(a0$2643) : a0$2643 instanceof Variable$2476) {
+                var v2$2645 = a0$2643;
+                return walk$2519(v2$2645, s$2639);
             }
-            var other$2641 = a0$2640;
-            return other$2641;
-        }.call(this, step$2515(v$2634, s$2636));
+            var other$2644 = a0$2643;
+            return other$2644;
+        }.call(this, step$2517(v$2637, s$2639));
     }
-    var v$2634 = a0$2632;
-    var _$2635 = a1$2633;
-    return v$2634;
+    var v$2637 = a0$2635;
+    var _$2638 = a1$2636;
+    return v$2637;
 }
-function equal$2521(u$2643, v$2644) {
-    return function (st$2646) {
-        return function (a0$2650) {
-            if (a0$2650 === false) {
-                return Value$2508(Failure$2492(st$2646.t), Done$2506);
+function equal$2523(u$2646, v$2647) {
+    return function (st$2649) {
+        return function (a0$2653) {
+            if (a0$2653 === false) {
+                return Value$2510(Failure$2494(st$2649.t), Done$2508);
             }
-            var s$2651 = a0$2650;
-            return Value$2508(Success$2491(s$2651, st$2646.c, st$2646.t), Done$2506);
-        }.call(this, unify$2523(u$2643, v$2644, st$2646.s));
+            var s$2654 = a0$2653;
+            return Value$2510(Success$2493(s$2654, st$2649.c, st$2649.t), Done$2508);
+        }.call(this, unify$2525(u$2646, v$2647, st$2649.s));
     };
 }
-function unify$2523(a0$2652, a1$2653, a2$2654) {
-    if (Substitutions$2485.hasInstance ? Substitutions$2485.hasInstance(a2$2654) : a2$2654 instanceof Substitutions$2485) {
-        var u$2655 = a0$2652;
-        var v$2656 = a1$2653;
-        var s$2657 = a2$2654;
-        return function (a0$2661, a1$2662) {
-            var r0$2663 = Variable$2474.unapply(a0$2661);
-            if (r0$2663 != null && r0$2663.length === 1) {
-                var r1$2665 = Variable$2474.unapply(a1$2662);
-                if (r1$2665 != null && (r1$2665.length === 1 && r0$2663[0] == r1$2665[0])) {
-                    var v$2666 = r0$2663[0];
-                    var u$2667 = r1$2665[0];
-                    return s$2657;
+function unify$2525(a0$2655, a1$2656, a2$2657) {
+    if (Substitutions$2487.hasInstance ? Substitutions$2487.hasInstance(a2$2657) : a2$2657 instanceof Substitutions$2487) {
+        var u$2658 = a0$2655;
+        var v$2659 = a1$2656;
+        var s$2660 = a2$2657;
+        return function (a0$2664, a1$2665) {
+            var r0$2666 = Variable$2476.unapply(a0$2664);
+            if (r0$2666 != null && r0$2666.length === 1) {
+                var r1$2668 = Variable$2476.unapply(a1$2665);
+                if (r1$2668 != null && (r1$2668.length === 1 && r0$2666[0] == r1$2668[0])) {
+                    var v$2669 = r0$2666[0];
+                    var u$2670 = r1$2668[0];
+                    return s$2660;
                 }
             }
-            if (Variable$2474.hasInstance ? Variable$2474.hasInstance(a0$2661) : a0$2661 instanceof Variable$2474) {
-                var u$2667 = a0$2661;
-                var v$2666 = a1$2662;
-                return s$2657.extend(u$2667, v$2666);
+            if (Variable$2476.hasInstance ? Variable$2476.hasInstance(a0$2664) : a0$2664 instanceof Variable$2476) {
+                var u$2670 = a0$2664;
+                var v$2669 = a1$2665;
+                return s$2660.extend(u$2670, v$2669);
             }
-            if (Variable$2474.hasInstance ? Variable$2474.hasInstance(a1$2662) : a1$2662 instanceof Variable$2474) {
-                var u$2667 = a0$2661;
-                var v$2666 = a1$2662;
-                return s$2657.extend(v$2666, u$2667);
+            if (Variable$2476.hasInstance ? Variable$2476.hasInstance(a1$2665) : a1$2665 instanceof Variable$2476) {
+                var u$2670 = a0$2664;
+                var v$2669 = a1$2665;
+                return s$2660.extend(v$2669, u$2670);
             }
-            var r2$2664 = Pair$2481.unapply(a1$2662);
-            if (r2$2664 != null && r2$2664.length === 2) {
-                var r3$2668 = Pair$2481.unapply(a0$2661);
-                if (r3$2668 != null && r3$2668.length === 2) {
-                    var a1$2669 = r3$2668[0];
-                    var d1$2670 = r3$2668[1];
-                    var a2$2671 = r2$2664[0];
-                    var d2$2672 = r2$2664[1];
-                    return unify$2523(d1$2670, d2$2672, unify$2523(a1$2669, a2$2671, s$2657));
+            var r2$2667 = Pair$2483.unapply(a1$2665);
+            if (r2$2667 != null && r2$2667.length === 2) {
+                var r3$2671 = Pair$2483.unapply(a0$2664);
+                if (r3$2671 != null && r3$2671.length === 2) {
+                    var a1$2672 = r3$2671[0];
+                    var d1$2673 = r3$2671[1];
+                    var a2$2674 = r2$2667[0];
+                    var d2$2675 = r2$2667[1];
+                    return unify$2525(d1$2673, d2$2675, unify$2525(a1$2672, a2$2674, s$2660));
                 }
             }
-            if (a0$2661 == a1$2662) {
-                var u$2667 = a0$2661;
-                var v$2666 = a1$2662;
-                return s$2657;
+            if (a0$2664 == a1$2665) {
+                var u$2670 = a0$2664;
+                var v$2669 = a1$2665;
+                return s$2660;
             }
             return false;
-        }.call(this, walk$2517(u$2655, s$2657), walk$2517(v$2656, s$2657));
+        }.call(this, walk$2519(u$2658, s$2660), walk$2519(v$2659, s$2660));
     }
     return false;
 }
-function call_fresh$2525(fn$2673) {
-    return function (a0$2677) {
-        if (Failure$2492.hasInstance ? Failure$2492.hasInstance(a0$2677) : a0$2677 instanceof Failure$2492) {
-            var f$2679 = a0$2677;
-            return Value$2508(f$2679, Done$2506);
+function call_fresh$2527(fn$2676) {
+    return function (a0$2680) {
+        if (Failure$2494.hasInstance ? Failure$2494.hasInstance(a0$2680) : a0$2680 instanceof Failure$2494) {
+            var f$2682 = a0$2680;
+            return Value$2510(f$2682, Done$2508);
         }
-        var r0$2678 = Success$2491.unapply(a0$2677);
-        if (r0$2678 != null && r0$2678.length === 3) {
-            var s$2680 = r0$2678[0];
-            var c$2681 = r0$2678[1];
-            var t$2682 = r0$2678[2];
-            return fn$2673(Variable$2474(c$2681))(Success$2491(s$2680, c$2681 + 1, t$2682));
+        var r0$2681 = Success$2493.unapply(a0$2680);
+        if (r0$2681 != null && r0$2681.length === 3) {
+            var s$2683 = r0$2681[0];
+            var c$2684 = r0$2681[1];
+            var t$2685 = r0$2681[2];
+            return fn$2676(Variable$2476(c$2684))(Success$2493(s$2683, c$2684 + 1, t$2685));
         }
         throw new TypeError('No match');
     };
 }
-function disj$2527(g1$2683, g2$2684) {
-    return function (st$2686) {
-        return mplus$2535(g1$2683(st$2686), g2$2684(st$2686));
+function disj$2529(g1$2686, g2$2687) {
+    return function (st$2689) {
+        return mplus$2537(g1$2686(st$2689), g2$2687(st$2689));
     };
 }
-function conj$2531(g1$2687, g2$2688) {
-    return function (st$2690) {
-        return bind$2539(g1$2687(st$2690), g2$2688);
+function conj$2533(g1$2690, g2$2691) {
+    return function (st$2693) {
+        return bind$2541(g1$2690(st$2693), g2$2691);
     };
 }
-function mplus$2535(a0$2691, a1$2692) {
-    if (Done$2506.hasInstance ? Done$2506.hasInstance(a0$2691) : a0$2691 instanceof Done$2506) {
-        var s$2695 = a1$2692;
-        return s$2695;
+function mplus$2537(a0$2694, a1$2695) {
+    if (Done$2508.hasInstance ? Done$2508.hasInstance(a0$2694) : a0$2694 instanceof Done$2508) {
+        var s$2698 = a1$2695;
+        return s$2698;
     }
-    var r0$2693 = Thunk$2507.unapply(a0$2691);
-    if (r0$2693 != null && (r0$2693.length === 1 && (Stream$2505.hasInstance ? Stream$2505.hasInstance(a1$2692) : a1$2692 instanceof Stream$2505))) {
-        var fn$2696 = r0$2693[0];
-        var s$2695 = a1$2692;
-        return Thunk$2507(function () {
-            return mplus$2535(s$2695, fn$2696);
+    var r0$2696 = Thunk$2509.unapply(a0$2694);
+    if (r0$2696 != null && (r0$2696.length === 1 && (Stream$2507.hasInstance ? Stream$2507.hasInstance(a1$2695) : a1$2695 instanceof Stream$2507))) {
+        var fn$2699 = r0$2696[0];
+        var s$2698 = a1$2695;
+        return Thunk$2509(function () {
+            return mplus$2537(s$2698, fn$2699);
         });
     }
-    var r1$2694 = Value$2508.unapply(a0$2691);
-    if (r1$2694 != null && (r1$2694.length === 2 && (Stream$2505.hasInstance ? Stream$2505.hasInstance(a1$2692) : a1$2692 instanceof Stream$2505))) {
-        var v$2698 = r1$2694[0];
-        var rest$2699 = r1$2694[1];
-        var s2$2700 = a1$2692;
-        return Value$2508(v$2698, mplus$2535(rest$2699, s2$2700));
+    var r1$2697 = Value$2510.unapply(a0$2694);
+    if (r1$2697 != null && (r1$2697.length === 2 && (Stream$2507.hasInstance ? Stream$2507.hasInstance(a1$2695) : a1$2695 instanceof Stream$2507))) {
+        var v$2701 = r1$2697[0];
+        var rest$2702 = r1$2697[1];
+        var s2$2703 = a1$2695;
+        return Value$2510(v$2701, mplus$2537(rest$2702, s2$2703));
     }
     throw new TypeError('No match');
 }
-function bind$2539(a0$2701, a1$2702) {
-    if (Done$2506.hasInstance ? Done$2506.hasInstance(a0$2701) : a0$2701 instanceof Done$2506) {
-        var _$2705 = a1$2702;
-        return Done$2506;
+function bind$2541(a0$2704, a1$2705) {
+    if (Done$2508.hasInstance ? Done$2508.hasInstance(a0$2704) : a0$2704 instanceof Done$2508) {
+        var _$2708 = a1$2705;
+        return Done$2508;
     }
-    var r0$2703 = Thunk$2507.unapply(a0$2701);
-    if (r0$2703 != null && r0$2703.length === 1) {
-        var fn$2706 = r0$2703[0];
-        var g$2707 = a1$2702;
-        return Thunk$2507(function () {
-            return bind$2539(fn$2706(), g$2707);
+    var r0$2706 = Thunk$2509.unapply(a0$2704);
+    if (r0$2706 != null && r0$2706.length === 1) {
+        var fn$2709 = r0$2706[0];
+        var g$2710 = a1$2705;
+        return Thunk$2509(function () {
+            return bind$2541(fn$2709(), g$2710);
         });
     }
-    var r1$2704 = Value$2508.unapply(a0$2701);
-    if (r1$2704 != null && r1$2704.length === 2) {
-        var v$2709 = r1$2704[0];
-        var rest$2710 = r1$2704[1];
-        var g$2707 = a1$2702;
-        return mplus$2535(g$2707(v$2709), bind$2539(rest$2710, g$2707));
+    var r1$2707 = Value$2510.unapply(a0$2704);
+    if (r1$2707 != null && r1$2707.length === 2) {
+        var v$2712 = r1$2707[0];
+        var rest$2713 = r1$2707[1];
+        var g$2710 = a1$2705;
+        return mplus$2537(g$2710(v$2712), bind$2541(rest$2713, g$2710));
     }
     throw new TypeError('No match');
 }
 /* Runner */
-function take$2540(a0$2711, a1$2712) {
-    if (a0$2711 === 0) {
-        var _$2715 = a1$2712;
+function take$2542(a0$2714, a1$2715) {
+    if (a0$2714 === 0) {
+        var _$2718 = a1$2715;
         return [];
     }
-    if (Done$2506.hasInstance ? Done$2506.hasInstance(a1$2712) : a1$2712 instanceof Done$2506) {
-        var n$2716 = a0$2711;
+    if (Done$2508.hasInstance ? Done$2508.hasInstance(a1$2715) : a1$2715 instanceof Done$2508) {
+        var n$2719 = a0$2714;
         return [];
     }
-    var r0$2713 = Thunk$2507.unapply(a1$2712);
-    if (r0$2713 != null && r0$2713.length === 1) {
-        var n$2716 = a0$2711;
-        var fn$2717 = r0$2713[0];
-        return take$2540(n$2716, fn$2717());
+    var r0$2716 = Thunk$2509.unapply(a1$2715);
+    if (r0$2716 != null && r0$2716.length === 1) {
+        var n$2719 = a0$2714;
+        var fn$2720 = r0$2716[0];
+        return take$2542(n$2719, fn$2720());
     }
-    var r1$2714 = Value$2508.unapply(a1$2712);
-    if (r1$2714 != null && r1$2714.length === 2) {
-        var r2$2718 = r1$2714[0];
-        if (Success$2491.hasInstance ? Success$2491.hasInstance(r2$2718) : r2$2718 instanceof Success$2491) {
-            var n$2716 = a0$2711;
-            var s$2719 = r2$2718;
-            var rest$2720 = r1$2714[1];
-            return [s$2719].concat(take$2540(n$2716 - 1, rest$2720));
+    var r1$2717 = Value$2510.unapply(a1$2715);
+    if (r1$2717 != null && r1$2717.length === 2) {
+        var r2$2721 = r1$2717[0];
+        if (Success$2493.hasInstance ? Success$2493.hasInstance(r2$2721) : r2$2721 instanceof Success$2493) {
+            var n$2719 = a0$2714;
+            var s$2722 = r2$2721;
+            var rest$2723 = r1$2717[1];
+            return [s$2722].concat(take$2542(n$2719 - 1, rest$2723));
         }
-        if (Failure$2492.hasInstance ? Failure$2492.hasInstance(r2$2718) : r2$2718 instanceof Failure$2492) {
-            var n$2716 = a0$2711;
-            var f$2721 = r2$2718;
-            var rest$2720 = r1$2714[1];
-            return take$2540(n$2716, rest$2720);
+        if (Failure$2494.hasInstance ? Failure$2494.hasInstance(r2$2721) : r2$2721 instanceof Failure$2494) {
+            var n$2719 = a0$2714;
+            var f$2724 = r2$2721;
+            var rest$2723 = r1$2717[1];
+            return take$2542(n$2719, rest$2723);
         }
     }
     throw new TypeError('No match');
 }
-var emptyState$2542 = Success$2491(Substitutions$2485([]), 0, []);
-function call_goal$2543(g$2722) {
-    return g$2722(emptyState$2542);
+var emptyState$2544 = Success$2493(Substitutions$2487([]), 0, []);
+function call_goal$2545(g$2725) {
+    return g$2725(emptyState$2544);
 }
 /* Convenience methods for inspecting the results */
-Cons$2479.prototype.toString = function () {
+Cons$2481.prototype.toString = function () {
     return '(' + this.toArray().join(', ') + ')';
 };
-Cons$2479.prototype.toArray = function () {
-    return function (a0$2726) {
-        if (Nil$2480.hasInstance ? Nil$2480.hasInstance(a0$2726) : a0$2726 instanceof Nil$2480) {
+Cons$2481.prototype.toArray = function () {
+    return function (a0$2729) {
+        if (Nil$2482.hasInstance ? Nil$2482.hasInstance(a0$2729) : a0$2729 instanceof Nil$2482) {
             return [];
         }
-        var r0$2727 = Pair$2481.unapply(a0$2726);
-        if (r0$2727 != null && r0$2727.length === 2) {
-            var r1$2728 = r0$2727[1];
-            if (Cons$2479.hasInstance ? Cons$2479.hasInstance(r1$2728) : r1$2728 instanceof Cons$2479) {
-                var a$2729 = r0$2727[0];
-                var d$2730 = r1$2728;
-                return [a$2729].concat(d$2730.toArray());
+        var r0$2730 = Pair$2483.unapply(a0$2729);
+        if (r0$2730 != null && r0$2730.length === 2) {
+            var r1$2731 = r0$2730[1];
+            if (Cons$2481.hasInstance ? Cons$2481.hasInstance(r1$2731) : r1$2731 instanceof Cons$2481) {
+                var a$2732 = r0$2730[0];
+                var d$2733 = r1$2731;
+                return [a$2732].concat(d$2733.toArray());
             }
-            var a$2729 = r0$2727[0];
-            var d$2730 = r1$2728;
-            return [a$2729].concat([d$2730]);
+            var a$2732 = r0$2730[0];
+            var d$2733 = r1$2731;
+            return [a$2732].concat([d$2733]);
         }
         throw new TypeError('No match');
     }.call(this, this);
 };
-Substitutions$2485.prototype.toObject = function () {
-    return this.variables.map(function (i$2732) {
-        return walkStar$2557(i$2732, this).toString();
+Substitutions$2487.prototype.toObject = function () {
+    return this.variables.map(function (i$2735) {
+        return walkStar$2559(i$2735, this).toString();
     }.bind(this));
 };
 // fixme: actual push/pop handling with indentation
-function inspectTraceFrame$2551(a0$2733) {
-    if (TraceFrame$2499.hasInstance ? TraceFrame$2499.hasInstance(a0$2733) : a0$2733 instanceof TraceFrame$2499) {
-        var t$2734 = a0$2733;
-        return t$2734.toString();
+function inspectTraceFrame$2553(a0$2736) {
+    if (TraceFrame$2501.hasInstance ? TraceFrame$2501.hasInstance(a0$2736) : a0$2736 instanceof TraceFrame$2501) {
+        var t$2737 = a0$2736;
+        return t$2737.toString();
     }
     throw new TypeError('No match');
 }
-function inspectTrace$2553(states$2735) {
-    return states$2735.map(function (a0$2739) {
-        var r0$2740 = Success$2491.unapply(a0$2739);
-        if (r0$2740 != null && r0$2740.length === 3) {
-            var s$2741 = r0$2740[0];
-            var c$2742 = r0$2740[1];
-            var t$2743 = r0$2740[2];
-            return 'Found: ' + reifyFirst$2555(s$2741) + ' via \n' + t$2743.map(inspectTraceFrame$2551).join('\n');
+function inspectTrace$2555(states$2738) {
+    return states$2738.map(function (a0$2742) {
+        var r0$2743 = Success$2493.unapply(a0$2742);
+        if (r0$2743 != null && r0$2743.length === 3) {
+            var s$2744 = r0$2743[0];
+            var c$2745 = r0$2743[1];
+            var t$2746 = r0$2743[2];
+            return 'Found: ' + reifyFirst$2557(s$2744) + ' via \n' + t$2746.map(inspectTraceFrame$2553).join('\n');
         }
         throw new TypeError('No match');
     }).join('\n\n');
 }
-function reifyFirst$2555(state$2744) {
-    return walkStar$2557(Variable$2474(0), state$2744);
+function reifyFirst$2557(state$2747) {
+    return walkStar$2559(Variable$2476(0), state$2747);
 }
-function walkStar$2557(v$2745, s$2746) {
-    return function (a0$2750) {
-        if (Variable$2474.hasInstance ? Variable$2474.hasInstance(a0$2750) : a0$2750 instanceof Variable$2474) {
-            var v$2753 = a0$2750;
-            return v$2753;
+function walkStar$2559(v$2748, s$2749) {
+    return function (a0$2753) {
+        if (Variable$2476.hasInstance ? Variable$2476.hasInstance(a0$2753) : a0$2753 instanceof Variable$2476) {
+            var v$2756 = a0$2753;
+            return v$2756;
         }
-        var r0$2751 = Pair$2481.unapply(a0$2750);
-        if (r0$2751 != null && r0$2751.length === 2) {
-            var a$2754 = r0$2751[0];
-            var d$2755 = r0$2751[1];
-            return Pair$2481(walkStar$2557(a$2754, s$2746), walkStar$2557(d$2755, s$2746));
+        var r0$2754 = Pair$2483.unapply(a0$2753);
+        if (r0$2754 != null && r0$2754.length === 2) {
+            var a$2757 = r0$2754[0];
+            var d$2758 = r0$2754[1];
+            return Pair$2483(walkStar$2559(a$2757, s$2749), walkStar$2559(d$2758, s$2749));
         }
-        var other$2752 = a0$2750;
-        return other$2752;
-    }.call(this, walk$2517(v$2745, s$2746));
+        var other$2755 = a0$2753;
+        return other$2755;
+    }.call(this, walk$2519(v$2748, s$2749));
 }
-function run$2559(n$2756, goal$2757) {
-    return take$2540(n$2756, call_goal$2543(call_fresh$2525(goal$2757))).map(function (state$2759) {
-        return reifyFirst$2555(state$2759.s);
+function run$2561(n$2759, goal$2760) {
+    return take$2542(n$2759, call_goal$2545(call_fresh$2527(goal$2760))).map(function (state$2762) {
+        return reifyFirst$2557(state$2762.s);
     });
 }
-function runTrace$2561(n$2760, goal$2761) {
-    return take$2540(n$2760, call_goal$2543(call_fresh$2525(goal$2761)));
+function runTrace$2563(n$2763, goal$2764) {
+    return take$2542(n$2763, call_goal$2545(call_fresh$2527(goal$2764)));
 }
 /* Tracing goals */
-function trace$2565(name$2762, goal$2763) {
-    return function (a0$2767) {
-        if (Failure$2492.hasInstance ? Failure$2492.hasInstance(a0$2767) : a0$2767 instanceof Failure$2492) {
-            var f$2768 = a0$2767;
-            return goal$2763(f$2768);
+function trace$2567(name$2765, goal$2766, variables$2767) {
+    return function (a0$2771) {
+        if (Failure$2494.hasInstance ? Failure$2494.hasInstance(a0$2771) : a0$2771 instanceof Failure$2494) {
+            var f$2772 = a0$2771;
+            return goal$2766(f$2772);
         }
-        if (Success$2491.hasInstance ? Success$2491.hasInstance(a0$2767) : a0$2767 instanceof Success$2491) {
-            var s$2769 = a0$2767;
-            return traceStream$2567(goal$2763(s$2769.addTrace(Push$2500(name$2762, s$2769.s))));
+        if (Success$2493.hasInstance ? Success$2493.hasInstance(a0$2771) : a0$2771 instanceof Success$2493) {
+            var s$2773 = a0$2771;
+            return traceStream$2569(goal$2766(s$2773.addTrace(Push$2502(name$2765, s$2773.s, variables$2767))));
         }
         throw new TypeError('No match');
     };
 }
-function traceStream$2567(a0$2770) {
-    if (Done$2506.hasInstance ? Done$2506.hasInstance(a0$2770) : a0$2770 instanceof Done$2506) {
-        return Done$2506;
+function traceStream$2569(a0$2774) {
+    if (Done$2508.hasInstance ? Done$2508.hasInstance(a0$2774) : a0$2774 instanceof Done$2508) {
+        return Done$2508;
     }
-    var r0$2771 = Thunk$2507.unapply(a0$2770);
-    if (r0$2771 != null && r0$2771.length === 1) {
-        var t$2773 = r0$2771[0];
-        return Thunk$2507(function () {
-            return traceStream$2567(t$2773());
+    var r0$2775 = Thunk$2509.unapply(a0$2774);
+    if (r0$2775 != null && r0$2775.length === 1) {
+        var t$2777 = r0$2775[0];
+        return Thunk$2509(function () {
+            return traceStream$2569(t$2777());
         });
     }
-    var r1$2772 = Value$2508.unapply(a0$2770);
-    if (r1$2772 != null && r1$2772.length === 2) {
-        var r2$2775 = r1$2772[0];
-        if (Failure$2492.hasInstance ? Failure$2492.hasInstance(r2$2775) : r2$2775 instanceof Failure$2492) {
-            var f$2776 = r2$2775;
-            var rest$2777 = r1$2772[1];
-            return Value$2508(f$2776, Done$2506);
+    var r1$2776 = Value$2510.unapply(a0$2774);
+    if (r1$2776 != null && r1$2776.length === 2) {
+        var r2$2779 = r1$2776[0];
+        if (Failure$2494.hasInstance ? Failure$2494.hasInstance(r2$2779) : r2$2779 instanceof Failure$2494) {
+            var f$2780 = r2$2779;
+            var rest$2781 = r1$2776[1];
+            return Value$2510(f$2780, Done$2508);
         }
-        if (State$2490.hasInstance ? State$2490.hasInstance(r2$2775) : r2$2775 instanceof State$2490) {
-            var s$2778 = r2$2775;
-            var rest$2777 = r1$2772[1];
-            return Value$2508(s$2778.addTrace(Pop$2501(s$2778.s)), traceStream$2567(rest$2777));
+        if (State$2492.hasInstance ? State$2492.hasInstance(r2$2779) : r2$2779 instanceof State$2492) {
+            var s$2782 = r2$2779;
+            var rest$2781 = r1$2776[1];
+            return Value$2510(s$2782.addTrace(Pop$2503(s$2782.s)), traceStream$2569(rest$2781));
         }
     }
     throw new TypeError('No match');
 }
 /* Let's try it out! */
-function appendo$2568(l$2779, s$2780, out$2781) {
-    return disj$2527(trace$2565('conj(equal(Nil, l), equal(s, out))', conj$2531(equal$2521(Nil$2480, l$2779), equal$2521(s$2780, out$2781))), call_fresh$2525(function (a$2783) {
-        return call_fresh$2525(function (d$2785) {
-            return conj$2531(trace$2565('equal(Pair(a, d), l)', equal$2521(Pair$2481(a$2783, d$2785), l$2779)), call_fresh$2525(function (res$2787) {
-                return conj$2531(trace$2565('equal(Pair(a, res), out)', equal$2521(Pair$2481(a$2783, res$2787), out$2781)), function (st$2789) {
-                    return trace$2565('appendo(d, s, res)', appendo$2568(d$2785, s$2780, res$2787))(st$2789);
+function appendo$2570(l$2783, s$2784, out$2785) {
+    return trace$2567('disj', disj$2529(trace$2567('conj(equal(Nil, l), equal(s, out))', conj$2533(equal$2523(Nil$2482, l$2783), equal$2523(s$2784, out$2785)), {
+        l: l$2783,
+        s: s$2784,
+        out: out$2785
+    }), call_fresh$2527(function (a$2787) {
+        return call_fresh$2527(function (d$2789) {
+            return conj$2533(trace$2567('equal(Pair(a, d), l)', equal$2523(Pair$2483(a$2787, d$2789), l$2783), {
+                a: a$2787,
+                d: d$2789,
+                l: l$2783
+            }), call_fresh$2527(function (res$2791) {
+                return conj$2533(trace$2567('equal(Pair(a, res), out)', equal$2523(Pair$2483(a$2787, res$2791), out$2785), {
+                    a: a$2787,
+                    res: res$2791,
+                    out: out$2785
+                }), function (st$2793) {
+                    return trace$2567('appendo(d, s, res)', appendo$2570(d$2789, s$2784, res$2791), {
+                        d: d$2789,
+                        s: s$2784,
+                        res: res$2791
+                    })(st$2793);
                 });
             }));
         });
-    }));
+    })), {
+        l: l$2783,
+        s: s$2784,
+        out: out$2785
+    });
 }
-console.log('(appendo \'(1 2) \'(3) q): ', run$2559(1, function (q$2790) {
-    return appendo$2568(Pair$2481(1, Pair$2481(2, Nil$2480)), Pair$2481(3, Nil$2480), q$2790);
+console.log('(appendo \'(1 2) \'(3) q): ', run$2561(1, function (q$2794) {
+    return appendo$2570(Pair$2483(1, Pair$2483(2, Nil$2482)), Pair$2483(3, Nil$2482), q$2794);
 }).toString());
-console.log('(appendo \'(1 2) q \'(1 2 3 4)): ', run$2559(1, function (q$2791) {
-    return appendo$2568(Pair$2481(1, Pair$2481(2, Nil$2480)), q$2791, Pair$2481(1, Pair$2481(2, Pair$2481(3, Pair$2481(4, Nil$2480)))));
+console.log('(appendo \'(1 2) q \'(1 2 3 4)): ', run$2561(1, function (q$2795) {
+    return appendo$2570(Pair$2483(1, Pair$2483(2, Nil$2482)), q$2795, Pair$2483(1, Pair$2483(2, Pair$2483(3, Pair$2483(4, Nil$2482)))));
 }).toString());
-console.log('(appendo q r \'(1 2 3)) for q: ', run$2559(10, function (q$2792) {
-    return call_fresh$2525(function (r$2794) {
-        return appendo$2568(q$2792, r$2794, Pair$2481(1, Pair$2481(2, Pair$2481(3, Nil$2480))));
+console.log('(appendo q r \'(1 2 3)) for q: ', run$2561(10, function (q$2796) {
+    return call_fresh$2527(function (r$2798) {
+        return appendo$2570(q$2796, r$2798, Pair$2483(1, Pair$2483(2, Pair$2483(3, Nil$2482))));
     });
 }).toString());
-var appendoTrace$2573 = runTrace$2561(5, function (q$2795) {
-        return call_fresh$2525(function (r$2797) {
-            return appendo$2568(q$2795, r$2797, Pair$2481(1, Pair$2481(2, Pair$2481(3, Pair$2481(4, Nil$2480)))));
+var appendoTrace$2575 = runTrace$2563(5, function (q$2799) {
+        return call_fresh$2527(function (r$2801) {
+            return appendo$2570(q$2799, r$2801, Pair$2483(1, Pair$2483(2, Pair$2483(3, Pair$2483(4, Nil$2482)))));
         });
     });
-console.log('How did we find answer to (appendo q r \'(1 2 3 4)): ', inspectTrace$2553(appendoTrace$2573));
+console.log('How did we find answer to (appendo q r \'(1 2 3 4)): ', inspectTrace$2555(appendoTrace$2575));
 /* Let's visualize it! */
-var TraceStack$2577 = function () {
-        function TraceStack$2798(name$2800, children$2801, before$2802, after$2803) {
-            if (!(this instanceof TraceStack$2798)) {
-                return new TraceStack$2798(name$2800, children$2801, before$2802, after$2803);
+var TraceStack$2579 = function () {
+        function TraceStack$2802(name$2804, children$2805, before$2806, after$2807, variables$2808) {
+            if (!(this instanceof TraceStack$2802)) {
+                return new TraceStack$2802(name$2804, children$2805, before$2806, after$2807, variables$2808);
             }
-            if (typeof name$2800 === 'string' || Object.prototype.toString.call(name$2800) === '[object String]') {
-                this.name = name$2800;
+            if (typeof name$2804 === 'string' || Object.prototype.toString.call(name$2804) === '[object String]') {
+                this.name = name$2804;
             } else {
                 throw new TypeError('Unexpected type for field: TraceStack.name');
             }
-            if (Array.isArray ? Array.isArray(children$2801) : Object.prototype.toString.call(children$2801) === '[object Array]') {
-                this.children = children$2801;
+            if (Array.isArray ? Array.isArray(children$2805) : Object.prototype.toString.call(children$2805) === '[object Array]') {
+                this.children = children$2805;
             } else {
                 throw new TypeError('Unexpected type for field: TraceStack.children');
             }
-            if (before$2802 instanceof Substitutions$2485) {
-                this.before = before$2802;
+            if (before$2806 instanceof Substitutions$2487) {
+                this.before = before$2806;
             } else {
                 throw new TypeError('Unexpected type for field: TraceStack.before');
             }
-            if (after$2803 instanceof Substitutions$2485) {
-                this.after = after$2803;
+            if (after$2807 instanceof Substitutions$2487) {
+                this.after = after$2807;
             } else {
                 throw new TypeError('Unexpected type for field: TraceStack.after');
             }
+            if (variables$2808 != null && (variables$2808 = Object(variables$2808))) {
+                this.variables = variables$2808;
+            } else {
+                throw new TypeError('Unexpected type for field: TraceStack.variables');
+            }
         }
-        var derived$2799 = Setter$2467.derive(Extractor$2466.derive(ToString$2468.derive(Clone$2464.derive(Eq$2465.derive({
+        var derived$2803 = Setter$2469.derive(Extractor$2468.derive(ToString$2470.derive(Clone$2466.derive(Eq$2467.derive({
                 name: 'TraceStack',
-                constructor: TraceStack$2798,
-                prototype: TraceStack$2798.prototype,
+                constructor: TraceStack$2802,
+                prototype: TraceStack$2802.prototype,
                 variants: [{
                         name: 'TraceStack',
-                        constructor: TraceStack$2798,
-                        prototype: TraceStack$2798.prototype,
+                        constructor: TraceStack$2802,
+                        prototype: TraceStack$2802.prototype,
                         fields: [
                             'name',
                             'children',
                             'before',
-                            'after'
+                            'after',
+                            'variables'
                         ]
                     }]
             })))));
-        return derived$2799.constructor;
+        return derived$2803.constructor;
     }();
-function traceToStack$2579(frames$2804) {
-    var stack$2805 = [];
-    var lastFrame$2806;
-    frames$2804.forEach(function (a0$2810) {
-        var r0$2811 = Push$2500.unapply(a0$2810);
-        if (r0$2811 != null && r0$2811.length === 2) {
-            var name$2813 = r0$2811[0];
-            var subs$2814 = r0$2811[1];
-            var trace$2815 = TraceStack$2577(name$2813, [], subs$2814, Substitutions$2485([]));
-            if (stack$2805[0]) {
-                stack$2805[0].children.push(trace$2815);
+function traceToStack$2581(frames$2809) {
+    var stack$2810 = [];
+    var lastFrame$2811;
+    frames$2809.forEach(function (a0$2815) {
+        var r0$2816 = Push$2502.unapply(a0$2815);
+        if (r0$2816 != null && r0$2816.length === 3) {
+            var name$2818 = r0$2816[0];
+            var subs$2819 = r0$2816[1];
+            var vs$2820 = r0$2816[2];
+            var trace$2821 = TraceStack$2579(name$2818, [], subs$2819, Substitutions$2487([]), vs$2820);
+            if (stack$2810[0]) {
+                stack$2810[0].children.push(trace$2821);
             }    // mutating this, not great
-            stack$2805.unshift(trace$2815);
+            stack$2810.unshift(trace$2821);
             return;
         }
-        var r1$2812 = Pop$2501.unapply(a0$2810);
-        if (r1$2812 != null && r1$2812.length === 1) {
-            var subs$2814 = r1$2812[0];
-            lastFrame$2806 = stack$2805.shift();
-            lastFrame$2806.after = subs$2814;
+        var r1$2817 = Pop$2503.unapply(a0$2815);
+        if (r1$2817 != null && r1$2817.length === 1) {
+            var subs$2819 = r1$2817[0];
+            lastFrame$2811 = stack$2810.shift();
+            lastFrame$2811.after = subs$2819;
             return;
         }
         throw new TypeError('No match');
     });
-    return lastFrame$2806;
+    return lastFrame$2811;
 }
-var React$2580 = require('react');
-var AnswerInspector$2581 = React$2580.createClass({
+var React$2582 = require('react');
+var AnswerInspector$2583 = React$2582.createClass({
         displayName: 'AnswerInspector',
         render: function () {
-            return React$2580.DOM.div(null, this.props.answers.map(function (state$2818) {
-                var stack$2819 = traceToStack$2579(state$2818.t);
-                return React$2580.DOM.div(null, React$2580.DOM.h2(null, 'Answer: ', reifyFirst$2555(state$2818.s).toString()), stack$2819 && TraceStackInspector$2582({ stack: traceToStack$2579(state$2818.t) }));
+            return React$2582.DOM.div(null, this.props.answers.map(function (state$2824) {
+                var stack$2825 = traceToStack$2581(state$2824.t);
+                return React$2582.DOM.div(null, React$2582.DOM.h2(null, 'Answer: ', reifyFirst$2557(state$2824.s).toString()), stack$2825 && TraceStackInspector$2584({ stack: traceToStack$2581(state$2824.t) }));
             }));
         }
     });
-var TraceStackInspector$2582 = React$2580.createClass({
+var TraceStackInspector$2584 = React$2582.createClass({
         displayName: 'TraceStackInspector',
         render: function () {
-            var children$2822 = this.props.stack.children.map(function (child$2823) {
-                    return TraceStackInspector$2582({ stack: child$2823 });
+            var children$2828 = this.props.stack.children.map(function (child$2829) {
+                    return TraceStackInspector$2584({ stack: child$2829 });
                 });
-            return React$2580.DOM.div({ className: 'stack' }, React$2580.DOM.span({ className: 'name' }, this.props.stack.name), SubstitutionTable$2583({
-                before: this.props.stack.before,
-                after: this.props.stack.after
-            }), children$2822.length > 0 && React$2580.DOM.div({ className: 'children' }, children$2822));
+            return React$2582.DOM.div({ className: 'stack' }, React$2582.DOM.span({ className: 'name' }, this.props.stack.name), SubstitutionTable$2585({ stack: this.props.stack }), children$2828.length > 0 && React$2582.DOM.div({ className: 'children' }, children$2828));
         }
     });
-var SubstitutionTable$2583 = React$2580.createClass({
+var SubstitutionTable$2585 = React$2582.createClass({
         displayName: 'SubstitutionTable',
         render: function () {
-            var before$2825 = this.props.before;
-            var after$2826 = this.props.after;
-            var rows$2827 = [];
-            for (var i$2828 = 0; i$2828 < after$2826.variables.length; i$2828++) {
-                var beforeAnswer$2829 = walkStar$2557(Variable$2474(i$2828), before$2825);
-                var afterAnswer$2830 = walkStar$2557(Variable$2474(i$2828), after$2826);
-                if (beforeAnswer$2829 == afterAnswer$2830 || beforeAnswer$2829.equals && beforeAnswer$2829.equals(afterAnswer$2830))
-                    continue;
-                rows$2827.push(React$2580.DOM.tr(null, React$2580.DOM.th(null, i$2828), React$2580.DOM.td(null, i$2828 in before$2825.variables && beforeAnswer$2829.toString()), React$2580.DOM.td(null, afterAnswer$2830.toString())));
+            var before$2831 = this.props.stack.before;
+            var after$2832 = this.props.stack.after;
+            var vs$2833 = this.props.stack.variables;
+            var rows$2834 = [];
+            for (var name$2835 in vs$2833) {
+                var beforeAnswer$2836 = walkStar$2559(vs$2833[name$2835], before$2831);
+                var afterAnswer$2837 = walkStar$2559(vs$2833[name$2835], after$2832);
+                rows$2834.push(React$2582.DOM.tr(null, React$2582.DOM.th(null, name$2835), React$2582.DOM.td(null, beforeAnswer$2836.toString()), React$2582.DOM.td(null, afterAnswer$2837.toString())));
             }
-            return React$2580.DOM.table({ className: 'substitutions' }, React$2580.DOM.tr(null, React$2580.DOM.th(), React$2580.DOM.th(null, 'Before'), React$2580.DOM.th(null, 'After')), rows$2827);
+            return React$2582.DOM.table({ className: 'substitutions' }, React$2582.DOM.tr(null, React$2582.DOM.th(), React$2582.DOM.th(null, 'Before'), React$2582.DOM.th(null, 'After')), rows$2834);
         }
     });
-React$2580.renderComponent(AnswerInspector$2581({ answers: appendoTrace$2573 }), document.getElementById('answers'));
+React$2582.renderComponent(AnswerInspector$2583({ answers: appendoTrace$2575 }), document.getElementById('answers'));
 
 },{"adt-simple":1,"react":146}]},{},[147]);

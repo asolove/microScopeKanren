@@ -56,7 +56,8 @@ State.prototype.addTrace = function {
 union TraceFrame {
 	Push {
 		name: String,
-		subs: Substitutions
+		subs: Substitutions,
+		variables: Object // name -> Variable
 	},
 	Pop {
 		subs: Substitutions
@@ -209,10 +210,10 @@ function runTrace(n, goal) {
 }
 
 /* Tracing goals */
-function trace(name, goal) {
+function trace(name, goal, variables) {
 	return function {
 		f@Failure => goal(f),
-		s@Success => traceStream(goal(s.addTrace(Push(name, s.s))))
+		s@Success => traceStream(goal(s.addTrace(Push(name, s.s, variables))))
 	}
 }
 
@@ -227,24 +228,24 @@ function traceStream {
 /* Let's try it out! */
 
 function appendo(l, s, out) {
-	return disj(
-		trace("conj(equal(Nil, l), equal(s, out))", conj(equal(Nil, l), equal(s, out))),
+	return trace("disj", disj(
+		trace("conj(equal(Nil, l), equal(s, out))", conj(equal(Nil, l), equal(s, out)), {l: l, s: s, out: out}),
 		call_fresh(function (a){
 			return call_fresh(function(d){
 				return conj(
-					trace("equal(Pair(a, d), l)", equal(Pair(a, d), l)),
+					trace("equal(Pair(a, d), l)", equal(Pair(a, d), l), {a: a, d: d, l: l}),
 					call_fresh(function(res){
 						return conj(
-							trace("equal(Pair(a, res), out)", equal(Pair(a, res), out)),
+							trace("equal(Pair(a, res), out)", equal(Pair(a, res), out), {a: a, res: res, out: out}),
 							function(st) {
-								return trace("appendo(d, s, res)", appendo(d, s, res))(st);
+								return trace("appendo(d, s, res)", appendo(d, s, res), {d: d, s: s, res: res})(st);
 							}
 						)
 					})
 				)
 			})
 		})
-	)
+	), {l: l, s: s, out: out})
 }
 
 console.log("(appendo '(1 2) '(3) q): ",
@@ -279,15 +280,16 @@ data TraceStack {
 	name: String,
 	children: Array, // of TraceStack
 	before: Substitutions,
-	after: Substitutions
+	after: Substitutions,
+	variables: Object // name -> Variable
 } deriving (Eq, Clone, ToString, Extractor, Setter)
 
 function traceToStack(frames) {
 	var stack = [];
 	var lastFrame;
 	frames.forEach(function {
-		Push(name, subs) => {
-			var trace = TraceStack(name, [], subs, Substitutions([]));
+		Push(name, subs, vs) => {
+			var trace = TraceStack(name, [], subs, Substitutions([]), vs);
 			if(stack[0]) {
 				stack[0].children.push(trace); // mutating this, not great
 			}
@@ -325,7 +327,7 @@ var TraceStackInspector = React.createClass({displayName: 'TraceStackInspector',
 
     return React.DOM.div({className: "stack"},
       React.DOM.span({className: "name"}, this.props.stack.name),
-      SubstitutionTable({before: this.props.stack.before, after: this.props.stack.after}),
+      SubstitutionTable({ stack: this.props.stack }),
       children.length > 0 && React.DOM.div({className: "children"}, children)
     );
   }
@@ -333,17 +335,18 @@ var TraceStackInspector = React.createClass({displayName: 'TraceStackInspector',
 
 var SubstitutionTable = React.createClass({displayName: 'SubstitutionTable',
   render: function() {
-  	var before = this.props.before;
-  	var after = this.props.after;
-    var rows = [] 
-    for(var i=0; i<after.variables.length; i++){
-    	var beforeAnswer = walkStar(Variable(i), before);
-    	var afterAnswer = walkStar(Variable(i), after);
-    	if(beforeAnswer == afterAnswer || beforeAnswer.equals && beforeAnswer.equals(afterAnswer)) continue;
+  	var before = this.props.stack.before;
+  	var after = this.props.stack.after;
+  	var vs = this.props.stack.variables;
 
+    var rows = []
+    for(var name in vs){
+    	var beforeAnswer = walkStar(vs[name], before);
+    	var afterAnswer = walkStar(vs[name], after);
+    	
       rows.push(React.DOM.tr(null,
-          React.DOM.th(null, i),
-          React.DOM.td(null, (i in before.variables) && beforeAnswer.toString()),
+          React.DOM.th(null, name),
+          React.DOM.td(null, beforeAnswer.toString()),
           React.DOM.td(null, afterAnswer.toString())
       ));
     }
