@@ -287,42 +287,40 @@ function traceToStack(frames) {
 	var lastFrame;
 	frames.forEach(function {
 		Push(name, subs) => {
-			console.log("push");
 			var trace = TraceStack(name, [], subs, Substitutions([]));
 			if(stack[0]) {
-				var current = stack[0];
-				stack[0] = current.set({children: current.children.concat(trace)});
-				console.log("adding trace to ", current)
-				//stack[0] = stack[0].set({children: stack[0].children.concat([trace])});
-			} else {
-				console.log("stack is empty")
+				stack[0] = stack[0].set({children: stack[0].children.concat([trace])});
 			}
 			stack.push(trace);
 		},
 		Pop(subs) => {
-			console.log("pop");
 			lastFrame = stack.pop().set({after: subs});
 		}
 	});
 	return lastFrame;
 }
 
-
+var React = require("react");
 
 var AnswerInspector = React.createClass({displayName: 'AnswerInspector',
   render: function(){
-    return this.props.answers.map(function(state){
-      return React.DOM.div(null,
-        React.DOM.h2(null, "Answer: ", reifyFirst(state)),
-        TraceStackInspector({stack: traceToStack(state.t)})
-      );
-    });
+    return React.DOM.div(null,
+	    this.props.answers.map(function(state){
+	    	var stack = traceToStack(state.t);
+	      return React.DOM.div(null,
+	        React.DOM.h2(null, "Answer: ", reifyFirst(state)),
+	        stack && TraceStackInspector({stack: traceToStack(state.t)})
+	      );
+	    })
+	  )
   }
 })
 
 var TraceStackInspector = React.createClass({displayName: 'TraceStackInspector',
   render: function() {
-    var children = this.props.stack.children.map(TrackStackInspector);
+    var children = this.props.stack.children.map(function(child){
+    	return TraceStackInspector({ stack: child });
+    });
 
     return React.DOM.div({className: "stack"},
       React.DOM.span({class: "name"}, this.props.stack.name),
@@ -339,7 +337,8 @@ var TraceStackInspector = React.createClass({displayName: 'TraceStackInspector',
 
 var SubstitutionTable = React.createClass({displayName: 'SubstitutionTable',
   render: function() {
-    rows = this.props.subs.variables.map(function(value, i){
+  	var subs = this.props.subs;
+    var rows = subs.variables.map(function(value, i){
       return React.DOM.tr(null,
                 React.DOM.th(null, i),
                 React.DOM.td(null, walkStar(Variable(i), subs))
@@ -351,4 +350,6 @@ var SubstitutionTable = React.createClass({displayName: 'SubstitutionTable',
   }
 });
 
-React.renderComponent(AnswerInspector, { answers: appendoTrace });
+React.renderComponent(
+	AnswerInspector({ answers: appendoTrace }),
+	document.getElementById("answers"));
