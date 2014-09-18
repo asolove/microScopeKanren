@@ -228,7 +228,7 @@ function traceStream {
 
 function appendo(l, s, out) {
 	return disj(
-		conj(equal(Nil, l), equal(s, out)),
+		trace("conj(equal(Nil, l), equal(s, out))", conj(equal(Nil, l), equal(s, out))),
 		call_fresh(function (a){
 			return call_fresh(function(d){
 				return conj(
@@ -289,12 +289,12 @@ function traceToStack(frames) {
 		Push(name, subs) => {
 			var trace = TraceStack(name, [], subs, Substitutions([]));
 			if(stack[0]) {
-				stack[0] = stack[0].set({children: stack[0].children.concat([trace])});
+				stack[0].children.push(trace); // mutating this, not great
 			}
-			stack.push(trace);
+			stack.unshift(trace);
 		},
 		Pop(subs) => {
-			lastFrame = stack.pop().set({after: subs});
+			lastFrame = stack.shift().set({after: subs});
 		}
 	});
 	return lastFrame;
@@ -308,7 +308,7 @@ var AnswerInspector = React.createClass({displayName: 'AnswerInspector',
 	    this.props.answers.map(function(state){
 	    	var stack = traceToStack(state.t);
 	      return React.DOM.div(null,
-	        React.DOM.h2(null, "Answer: ", reifyFirst(state)),
+	        React.DOM.h2(null, "Answer: ", reifyFirst(state.s)),
 	        stack && TraceStackInspector({stack: traceToStack(state.t)})
 	      );
 	    })
@@ -330,7 +330,7 @@ var TraceStackInspector = React.createClass({displayName: 'TraceStackInspector',
       React.DOM.div({className: "after"},
         SubstitutionTable({subs: this.props.stack.after})
       ),
-      React.DOM.div({className: "children"}, children)
+      children.length > 0 && React.DOM.div({className: "children"}, children)
     );
   }
 });

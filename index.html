@@ -2,9 +2,21 @@
 <html>
 <head>
   <title>Visualizing appendo</title>
+  <style>
+    body { font: 14px/1.4 helvetica; width: 600px; margin: 20px auto;}
+    .stack {
+      padding: 5px; 
+      background-color: rgba(100,200,100,0.1);
+      border: 1px solid rgba(100,200,100,0.4);
+      color: #555;
+    }
+    .stack .name { margin-bottom}
+    .stack .children { margin-left: 30px; }
+    .before, .after { display: none; }
+  </style>
 </head>
 <body>
-  <h1>Visualizing append<sup>o</sup></h1>
+  <h1>Visualizing (append<sup>o</sup> q r '(1 2 3 4))</h1>
 
   <div id="answers"></div>
 

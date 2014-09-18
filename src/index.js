@@ -19608,7 +19608,7 @@ function traceStream$2565(a0$2768) {
 }
 /* Let's try it out! */
 function appendo$2566(l$2777, s$2778, out$2779) {
-    return disj$2525(conj$2529(equal$2519(Nil$2478, l$2777), equal$2519(s$2778, out$2779)), call_fresh$2523(function (a$2781) {
+    return disj$2525(trace$2563('conj(equal(Nil, l), equal(s, out))', conj$2529(equal$2519(Nil$2478, l$2777), equal$2519(s$2778, out$2779))), call_fresh$2523(function (a$2781) {
         return call_fresh$2523(function (d$2783) {
             return conj$2529(trace$2563('equal(Pair(a, d), l)', equal$2519(Pair$2479(a$2781, d$2783), l$2777)), call_fresh$2523(function (res$2785) {
                 return conj$2529(trace$2563('equal(Pair(a, res), out)', equal$2519(Pair$2479(a$2781, res$2785), out$2779)), function (st$2787) {
@@ -19690,15 +19690,15 @@ function traceToStack$2577(frames$2802) {
             var subs$2812 = r0$2809[1];
             var trace$2813 = TraceStack$2575(name$2811, [], subs$2812, Substitutions$2483([]));
             if (stack$2803[0]) {
-                stack$2803[0] = stack$2803[0].set({ children: stack$2803[0].children.concat([trace$2813]) });
-            }
-            stack$2803.push(trace$2813);
+                stack$2803[0].children.push(trace$2813);
+            }    // mutating this, not great
+            stack$2803.unshift(trace$2813);
             return;
         }
         var r1$2810 = Pop$2499.unapply(a0$2808);
         if (r1$2810 != null && r1$2810.length === 1) {
             var subs$2812 = r1$2810[0];
-            lastFrame$2804 = stack$2803.pop().set({ after: subs$2812 });
+            lastFrame$2804 = stack$2803.shift().set({ after: subs$2812 });
             return;
         }
         throw new TypeError('No match');
@@ -19711,20 +19711,17 @@ var AnswerInspector$2579 = React$2578.createClass({
         render: function () {
             return React$2578.DOM.div(null, this.props.answers.map(function (state$2816) {
                 var stack$2817 = traceToStack$2577(state$2816.t);
-                return React$2578.DOM.div(null, React$2578.DOM.h2(null, 'Answer: ', reifyFirst$2553(state$2816)), stack$2817 && TraceStackInspector$2580({ stack: traceToStack$2577(state$2816.t) }));
+                return React$2578.DOM.div(null, React$2578.DOM.h2(null, 'Answer: ', reifyFirst$2553(state$2816.s)), stack$2817 && TraceStackInspector$2580({ stack: traceToStack$2577(state$2816.t) }));
             }));
         }
     });
 var TraceStackInspector$2580 = React$2578.createClass({
         displayName: 'TraceStackInspector',
         render: function () {
-            console.log('TraceStackInspector');
-            if (!this.props.stack)
-                debugger;
             var children$2820 = this.props.stack.children.map(function (child$2821) {
                     return TraceStackInspector$2580({ stack: child$2821 });
                 });
-            return React$2578.DOM.div({ className: 'stack' }, React$2578.DOM.span({ class: 'name' }, this.props.stack.name), React$2578.DOM.div({ className: 'before' }, SubstitutionTable$2581({ subs: this.props.stack.before })), React$2578.DOM.div({ className: 'after' }, SubstitutionTable$2581({ subs: this.props.stack.after })), React$2578.DOM.div({ className: 'children' }, children$2820));
+            return React$2578.DOM.div({ className: 'stack' }, React$2578.DOM.span({ class: 'name' }, this.props.stack.name), React$2578.DOM.div({ className: 'before' }, SubstitutionTable$2581({ subs: this.props.stack.before })), React$2578.DOM.div({ className: 'after' }, SubstitutionTable$2581({ subs: this.props.stack.after })), children$2820.length > 0 && React$2578.DOM.div({ className: 'children' }, children$2820));
         }
     });
 var SubstitutionTable$2581 = React$2578.createClass({
