@@ -647,8 +647,87 @@ console.log('(appendo q r \'(1 2 3)) for q: ', run(10, function (q) {
         return appendo(q, r, Pair(1, Pair(2, Pair(3, Nil))));
     });
 }).toString());
-console.log('How did we find answer to (appendo q r \'(1 2 3 4)): ', inspectTrace(runTrace(5, function (q) {
-    return call_fresh(function (r) {
-        return appendo(q, r, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))));
+var appendoTrace = runTrace(5, function (q) {
+        return call_fresh(function (r) {
+            return appendo(q, r, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))));
+        });
     });
-})));
+console.log('How did we find answer to (appendo q r \'(1 2 3 4)): ', inspectTrace(appendoTrace));
+/* Let's visualize it! */
+var TraceStack = function () {
+        function TraceStack$2(name, children, before, after) {
+            if (!(this instanceof TraceStack$2)) {
+                return new TraceStack$2(name, children, before, after);
+            }
+            if (typeof name === 'string' || Object.prototype.toString.call(name) === '[object String]') {
+                this.name = name;
+            } else {
+                throw new TypeError('Unexpected type for field: TraceStack.name');
+            }
+            if (Array.isArray ? Array.isArray(children) : Object.prototype.toString.call(children) === '[object Array]') {
+                this.children = children;
+            } else {
+                throw new TypeError('Unexpected type for field: TraceStack.children');
+            }
+            if (before instanceof Substitutions) {
+                this.before = before;
+            } else {
+                throw new TypeError('Unexpected type for field: TraceStack.before');
+            }
+            if (after instanceof Substitutions) {
+                this.after = after;
+            } else {
+                throw new TypeError('Unexpected type for field: TraceStack.after');
+            }
+        }
+        var derived = Setter.derive(Extractor.derive(ToString.derive(Clone.derive(Eq.derive({
+                name: 'TraceStack',
+                constructor: TraceStack$2,
+                prototype: TraceStack$2.prototype,
+                variants: [{
+                        name: 'TraceStack',
+                        constructor: TraceStack$2,
+                        prototype: TraceStack$2.prototype,
+                        fields: [
+                            'name',
+                            'children',
+                            'before',
+                            'after'
+                        ]
+                    }]
+            })))));
+        return derived.constructor;
+    }();
+function traceToStack(frames) {
+    var stack = [];
+    var lastFrame;
+    frames.forEach(function (a0) {
+        var r0 = Push.unapply(a0);
+        if (r0 != null && r0.length === 2) {
+            var name = r0[0];
+            var subs = r0[1];
+            console.log('push');
+            var trace$2 = TraceStack(name, [], subs, Substitutions([]));
+            if (stack[0]) {
+                var current = stack[0];
+                stack[0] = current.set({ children: current.children.concat(trace$2) });
+                console.log('adding trace to ', current);
+            }    //stack[0] = stack[0].set({children: stack[0].children.concat([trace])});
+            else {
+                console.log('stack is empty');
+            }
+            stack.push(trace$2);
+            return;
+        }
+        var r1 = Pop.unapply(a0);
+        if (r1 != null && r1.length === 1) {
+            var subs = r1[0];
+            console.log('pop');
+            lastFrame = stack.pop().set({ after: subs });
+            return;
+        }
+        throw new TypeError('No match');
+    });
+    return lastFrame;
+}
+console.log(traceToStack(appendoTrace[3].t));

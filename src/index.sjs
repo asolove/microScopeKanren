@@ -261,9 +261,47 @@ console.log("(appendo q r '(1 2 3)) for q: ",
 		})
 	}).toString())
 
-console.log("How did we find answer to (appendo q r '(1 2 3 4)): ",
-	inspectTrace(runTrace(5, function(q){
+var appendoTrace = runTrace(5, function(q){
 		return call_fresh(function(r){
 			return appendo(q, r, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))));
 		})
-	})));
+	})
+
+console.log("How did we find answer to (appendo q r '(1 2 3 4)): ",
+	inspectTrace(appendoTrace));
+
+/* Let's visualize it! */
+
+data TraceStack {
+	name: String,
+	children: Array, // of TraceStack
+	before: Substitutions,
+	after: Substitutions
+} deriving (Eq, Clone, ToString, Extractor, Setter)
+
+function traceToStack(frames) {
+	var stack = [];
+	var lastFrame;
+	frames.forEach(function {
+		Push(name, subs) => {
+			console.log("push");
+			var trace = TraceStack(name, [], subs, Substitutions([]));
+			if(stack[0]) {
+				var current = stack[0];
+				stack[0] = current.set({children: current.children.concat(trace)});
+				console.log("adding trace to ", current)
+				//stack[0] = stack[0].set({children: stack[0].children.concat([trace])});
+			} else {
+				console.log("stack is empty")
+			}
+			stack.push(trace);
+		},
+		Pop(subs) => {
+			console.log("pop");
+			lastFrame = stack.pop().set({after: subs});
+		}
+	});
+	return lastFrame;
+}
+
+console.log(traceToStack(appendoTrace[3].t));
