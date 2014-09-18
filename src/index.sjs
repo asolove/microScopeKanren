@@ -7,6 +7,9 @@ var Extractor = require('adt-simple').Extractor;
 var Setter = require('adt-simple').Setter;
 var ToString = require('adt-simple').ToString;
 
+import macros from 'sparkler/macros'
+import macros from 'adt-simple/macros'
+
 
 data Variable {
 	i: Number
@@ -305,46 +308,47 @@ function traceToStack(frames) {
 }
 
 
-var AnswerInspector = React.createClass({
-	render: function(){
-		return this.props.answers.map(function(state){
-			return <div>
-				<h2>Answer: {reifyFirst(state)}</h2>
-				<TraceStackInspector stack={traceToStack(state.t)}/>
-			</div>;
-		});
-	}
+
+var AnswerInspector = React.createClass({displayName: 'AnswerInspector',
+  render: function(){
+    return this.props.answers.map(function(state){
+      return React.DOM.div(null,
+        React.DOM.h2(null, "Answer: ", reifyFirst(state)),
+        TraceStackInspector({stack: traceToStack(state.t)})
+      );
+    });
+  }
 })
 
-var TraceStackInspector = React.createClass({
-	render: function() {
-		var children = this.props.stack.children.map(TrackStackInspector);
+var TraceStackInspector = React.createClass({displayName: 'TraceStackInspector',
+  render: function() {
+    var children = this.props.stack.children.map(TrackStackInspector);
 
-		return <div className="stack">
-			<span class="name">{this.props.stack.name}</span>
-			<div className="before">
-				<SubstitutionTable subs={this.props.stack.before} />
-			</div>
-			<div className="after">
-				<SubstitutionTable subs={this.props.stack.after} />
-			</div>
-			<div className="children">{children}</div>
-		</div>;
-	}
+    return React.DOM.div({className: "stack"},
+      React.DOM.span({class: "name"}, this.props.stack.name),
+      React.DOM.div({className: "before"},
+        SubstitutionTable({subs: this.props.stack.before})
+      ),
+      React.DOM.div({className: "after"},
+        SubstitutionTable({subs: this.props.stack.after})
+      ),
+      React.DOM.div({className: "children"}, children)
+    );
+  }
 });
 
-var SubstitutionTable = React.createClass({
-	render: function() {
-		rows = this.props.subs.variables.map(function(value, i){
-			return <tr>
-								<th>{i}</th>
-								<td>{walkStar(Variable(i), subs)}</td>
-						</tr>;
-		});
-		return <table class="substitutions">
-			{rows}
-		</table>
-	}
+var SubstitutionTable = React.createClass({displayName: 'SubstitutionTable',
+  render: function() {
+    rows = this.props.subs.variables.map(function(value, i){
+      return React.DOM.tr(null,
+                React.DOM.th(null, i),
+                React.DOM.td(null, walkStar(Variable(i), subs))
+            );
+    });
+    return React.DOM.table({class: "substitutions"},
+      rows
+    )
+  }
 });
 
 React.renderComponent(AnswerInspector, { answers: appendoTrace });
