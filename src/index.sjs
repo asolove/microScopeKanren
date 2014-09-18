@@ -158,7 +158,7 @@ function call_goal(g) {
 /* Convenience methods for inspecting the results */
 
 Cons.prototype.toString = function(){
-	return "(" + this.toArray().join(",") + ")";
+	return "(" + this.toArray().join(", ") + ")";
 }
 
 Cons.prototype.toArray = function() {
@@ -325,16 +325,7 @@ var TraceStackInspector = React.createClass({displayName: 'TraceStackInspector',
 
     return React.DOM.div({className: "stack"},
       React.DOM.span({className: "name"}, this.props.stack.name),
-      React.DOM.div({className: "substitutions"},
-	      React.DOM.div({className: "before"},
-	      	React.DOM.strong(null, "Before"),
-	        SubstitutionTable({subs: this.props.stack.before})
-	      ),
-	      React.DOM.div({className: "after"},
-	      	React.DOM.strong(null, "After"),
-	        SubstitutionTable({subs: this.props.stack.after})
-	      )
-      ),
+      SubstitutionTable({before: this.props.stack.before, after: this.props.stack.after}),
       children.length > 0 && React.DOM.div({className: "children"}, children)
     );
   }
@@ -342,14 +333,23 @@ var TraceStackInspector = React.createClass({displayName: 'TraceStackInspector',
 
 var SubstitutionTable = React.createClass({displayName: 'SubstitutionTable',
   render: function() {
-  	var subs = this.props.subs;
-    var rows = subs.variables.map(function(value, i){
-      return React.DOM.tr(null,
-                React.DOM.th(null, i),
-                React.DOM.td(null, walkStar(Variable(i), subs).toString())
-            );
-    });
-    return React.DOM.table({class: "substitutions"},
+  	var before = this.props.before;
+  	var after = this.props.after;
+    var rows = [] 
+    for(var i=0; i<after.variables.length; i++){
+    	var beforeAnswer = walkStar(Variable(i), before);
+    	var afterAnswer = walkStar(Variable(i), after);
+    	if(beforeAnswer == afterAnswer || beforeAnswer.equals && beforeAnswer.equals(afterAnswer)) continue;
+
+      rows.push(React.DOM.tr(null,
+          React.DOM.th(null, i),
+          React.DOM.td(null, (i in before.variables) && beforeAnswer.toString()),
+          React.DOM.td(null, afterAnswer.toString())
+      ));
+    }
+    return React.DOM.table({className: "substitutions"},
+    	React.DOM.tr(null,
+    		React.DOM.th(), React.DOM.th(null, "Before"), React.DOM.th(null, "After")),
       rows
     )
   }
