@@ -159,7 +159,7 @@ function call_goal(g) {
 /* Convenience methods for inspecting the results */
 
 Cons.prototype.toString = function(){
-	return "(" + this.toArray().join(", ") + ")";
+	return "(" + this.toArray().join(" ") + ")";
 }
 
 Cons.prototype.toArray = function() {
@@ -228,7 +228,7 @@ function traceStream {
 /* Let's try it out! */
 
 function appendo(l, s, out) {
-	return trace("disj", disj(
+	return disj(
 		trace("conj(equal(Nil, l), equal(s, out))", conj(equal(Nil, l), equal(s, out)), {l: l, s: s, out: out}),
 		call_fresh(function (a){
 			return call_fresh(function(d){
@@ -245,7 +245,7 @@ function appendo(l, s, out) {
 				)
 			})
 		})
-	), {l: l, s: s, out: out})
+	)
 }
 
 console.log("(appendo '(1 2) '(3) q): ",
@@ -266,9 +266,14 @@ console.log("(appendo q r '(1 2 3)) for q: ",
 	}).toString())
 
 var appendoTrace = runTrace(5, function(q){
-		return call_fresh(function(r){
-			return appendo(q, r, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))));
-		})
+		return call_fresh(function(a){
+			return call_fresh(function(b){
+				return conj(
+					equal(Pair(a, Pair(b, Nil)), q),
+					appendo(b, a, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))))
+				);
+			});
+		});
 	})
 
 console.log("How did we find answer to (appendo q r '(1 2 3 4)): ",
