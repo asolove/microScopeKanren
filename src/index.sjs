@@ -253,7 +253,9 @@ var appendoTrace = runTrace(5, function(q){
 			return call_fresh(function(b){
 				return conj(
 					equal(Pair(a, Pair(b, Nil)), q),
-					appendo(a, b, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))))
+					trace("appendo(a, b, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))))", 
+						appendo(a, b, Pair(1, Pair(2, Pair(3, Pair(4, Nil))))),
+						{a: a, b: b })
 				);
 			});
 		});
@@ -282,7 +284,7 @@ function traceToStack(frames) {
 		},
 		Pop(subs) => {
 			lastFrame = stack.shift();
-			lastFrame.after = subs; // more mutattion, sorry
+			lastFrame.after = subs; // more mutation, sorry
 		}
 	});
 	return lastFrame;

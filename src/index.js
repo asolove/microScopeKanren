@@ -19643,7 +19643,10 @@ function appendo$2567(l$2777, s$2778, out$2779) {
 var appendoTrace$2572 = runTrace$2560(5, function (q$2788) {
         return call_fresh$2524(function (a$2790) {
             return call_fresh$2524(function (b$2792) {
-                return conj$2530(equal$2520(Pair$2480(a$2790, Pair$2480(b$2792, Nil$2479)), q$2788), appendo$2567(a$2790, b$2792, Pair$2480(1, Pair$2480(2, Pair$2480(3, Pair$2480(4, Nil$2479))))));
+                return conj$2530(equal$2520(Pair$2480(a$2790, Pair$2480(b$2792, Nil$2479)), q$2788), trace$2564('appendo(a, b, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))))', appendo$2567(a$2790, b$2792, Pair$2480(1, Pair$2480(2, Pair$2480(3, Pair$2480(4, Nil$2479))))), {
+                    a: a$2790,
+                    b: b$2792
+                }));
             });
         });
     });
@@ -19700,7 +19703,7 @@ var TraceStack$2573 = function () {
     }();
 function traceToStack$2575(frames$2800) {
     var stack$2801 = [];
-    var lastFrame$2802;
+    var lastStack$2802;
     frames$2800.forEach(function (a0$2806) {
         var r0$2807 = Push$2499.unapply(a0$2806);
         if (r0$2807 != null && r0$2807.length === 3) {
@@ -19717,13 +19720,13 @@ function traceToStack$2575(frames$2800) {
         var r1$2808 = Pop$2500.unapply(a0$2806);
         if (r1$2808 != null && r1$2808.length === 1) {
             var subs$2810 = r1$2808[0];
-            lastFrame$2802 = stack$2801.shift();
-            lastFrame$2802.after = subs$2810;
+            lastStack$2802 = stack$2801.shift();
+            lastStack$2802.after = subs$2810;
             return;
         }
         throw new TypeError('No match');
     });
-    return lastFrame$2802;
+    return lastStack$2802;
 }
 var React$2576 = require('react');
 var AnswerInspector$2577 = React$2576.createClass({
