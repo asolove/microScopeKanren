@@ -248,36 +248,16 @@ function appendo(l, s, out) {
 	)
 }
 
-console.log("(appendo '(1 2) '(3) q): ",
-	run(1, function(q){
-		return appendo(Pair(1, Pair(2, Nil)), Pair(3, Nil), q)
-	}).toString())
-
-console.log("(appendo '(1 2) q '(1 2 3 4)): ",
-	run(1, function(q){
-		return appendo(Pair(1, Pair(2, Nil)), q, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))))
-	}).toString())
-
-console.log("(appendo q r '(1 2 3)) for q: ",
-	run(10, function(q){
-		return call_fresh(function(r){
-			return appendo(q, r, Pair(1, Pair(2, Pair(3, Nil))));
-		})
-	}).toString())
-
 var appendoTrace = runTrace(5, function(q){
 		return call_fresh(function(a){
 			return call_fresh(function(b){
 				return conj(
 					equal(Pair(a, Pair(b, Nil)), q),
-					appendo(b, a, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))))
+					appendo(a, b, Pair(1, Pair(2, Pair(3, Pair(4, Nil)))))
 				);
 			});
 		});
 	})
-
-console.log("How did we find answer to (appendo q r '(1 2 3 4)): ",
-	inspectTrace(appendoTrace));
 
 /* Let's visualize it! */
 
