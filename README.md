@@ -11,6 +11,13 @@ logic variables and unifications as the program runs.
 The goal is to be able to see how your program runs: how do different 
 parts of the program interleave answers?
 
+Background
+----------
+
+MicroKanren [1] is a tiny functional core for logic programming.
+
+This repo implements that core in JavaScript, plus traces the program as it runs.
+
 Todo
 ----
 
@@ -18,3 +25,5 @@ Todo
 - Visualize interleaving of traced goals
 - MiniKanren macros
 - Make importable as a library
+
+[1] http://webyrd.net/scheme-2013/papers/HemannMuKanren2013.pdf
