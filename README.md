@@ -1,10 +1,12 @@
 Micro Scope Kanren
 ==================
 
+<img width="687" alt="image" src="https://user-images.githubusercontent.com/8495/210161127-3f4727c8-78f0-4fc8-9b12-fc5f9c915ba8.png">
+
 The relation between you and your logic program.
 
-A JavaScript implementation of MicroKanren (plus macros for MiniKanren)
-focused on inspecting logic programs as they run.
+A JavaScript implementation of MicroKanren that also traces
+logic variables and unifications as the program runs.
 
 The goal is to be able to see how your program runs: how do different 
 parts of the program interleave answers?
